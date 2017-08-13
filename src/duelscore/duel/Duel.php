@@ -20,6 +20,7 @@ namespace duelscore\duel;
 
 use core\Utils;
 use duelscore\DuelsCorePlayer;
+use pocketmine\utils\TextFormat;
 
 class Duel {
 
@@ -27,16 +28,33 @@ class Duel {
 	private $manager;
 
 	/** @var int */
-	private $countdown = 15; // 15 seconds
+	private $countdown = self::DEFAULT_COUNTDOWN;
 
 	/** @var int */
-	private $duration = 900; // 15 minutes
+	private $duration = self::DEFAULT_DURATION;
+
+	/** @var int */
+	private $teamSize = self::DEFAULT_TEAM_SIZE;
+
+	/** @var int */
+	private $teamCount = self::DEFAULT_TEAM_COUNT;
+
+	/** @var array */
+	private $teams = [];
 
 	/** @var string[] */
 	private $players = [];
 
 	/** @var string[] */
 	private $spectators = [];
+
+	/** @var bool */
+	private $active = true;
+
+	const DEFAULT_COUNTDOWN = 5; // 5 seconds
+	const DEFAULT_DURATION = 900; // 15 minutes
+	const DEFAULT_TEAM_SIZE = 1; // For 1v1's
+	const DEFAULT_TEAM_COUNT = 2; // For 1v1's
 
 	public function __construct(DuelManager $manager) {
 		$this->manager = $manager;
@@ -50,12 +68,39 @@ class Duel {
 		}
 	}
 
-	public function handleCountdown() {
-
+	private function handleCountdown() { // Do stuff when the countdown is active
+		if($this->countdown < 7) {
+			switch($this->countdown) {
+				case 6:
+				case 5:
+				case 4:
+					$color = TextFormat::GOLD;
+					break;
+				case 3:
+				case 2:
+				case 1:
+					$color = TextFormat::RED;
+					break;
+				default:
+					$color = TextFormat::GREEN;
+					break;
+			}
+			$this->broadcastMessage("{$color}Match starting in {$this->countdown}...");
+			$this->broadcastTitle("{$color}Match starting in:", "{$color}{$this->countdown}...", 1, 20, 1);
+		} else {
+			$currentPlayers = count($this->players);
+			$requiredPlayers = $this->teamCount * $this->teamSize;
+			if($currentPlayers >= $requiredPlayers) {
+				$this->broadcastTip(TextFormat::GREEN . "Match begins in {$this->countdown}...");
+			} else {
+				$this->broadcastTip(TextFormat::GREEN . "Waiting for players ({$currentPlayers}/{$requiredPlayers})");
+			}
+		}
+		$this->countdown--;
 	}
 
-	public function handleDuration() {
-
+	private function handleDuration() { // Do stuff when the duel is active
+		$this->duration--;
 	}
 
 	/**
@@ -195,6 +240,69 @@ class Duel {
 			if($player instanceof DuelsCorePlayer and $player->isOnline()) {
 				$player->sendMessage($message);
 			}
+		}
+	}
+
+	/**
+	 * Broadcast a popup to all players and spectators in the duel
+	 *
+	 * @param string $message
+	 */
+	public function broadcastPopup(string $message) {
+		foreach(array_merge($this->players, $this->spectators) as $name => $uuid) {
+			$player = Utils::getPlayerByUUID($uuid);
+			if($player instanceof DuelsCorePlayer and $player->isOnline()) {
+				$player->sendPopup($message);
+			}
+		}
+	}
+
+	/**
+	 * Broadcast a tip to all players and spectators in the duel
+	 *
+	 * @param string $message
+	 */
+	public function broadcastTip(string $message) {
+		foreach(array_merge($this->players, $this->spectators) as $name => $uuid) {
+			$player = Utils::getPlayerByUUID($uuid);
+			if($player instanceof DuelsCorePlayer and $player->isOnline()) {
+				$player->sendTip($message);
+			}
+		}
+	}
+
+	/**
+	 * Broadcast a title to all players and spectators in the duel
+	 *
+	 * @param string $title
+	 * @param string $subtitle
+	 * @param int $fadeIn
+	 * @param int $stay
+	 * @param int $fadeOut
+	 */
+	public function broadcastTitle(string $title, string $subtitle = "", int $fadeIn = -1, int $stay = -1, int $fadeOut = -1) {
+		foreach(array_merge($this->players, $this->spectators) as $name => $uuid) {
+			$player = Utils::getPlayerByUUID($uuid);
+			if($player instanceof DuelsCorePlayer and $player->isOnline()) {
+				$player->addTitle($title, $subtitle, $fadeIn, $stay, $fadeOut);
+			}
+		}
+	}
+
+	/**
+	 * @return bool
+	 */
+	public function isActive() : bool {
+		return $this->active;
+	}
+
+	public function __destruct() {
+		$this->close();
+	}
+
+	public function close() {
+		if($this->active) {
+			$this->active = false;
 		}
 	}
 

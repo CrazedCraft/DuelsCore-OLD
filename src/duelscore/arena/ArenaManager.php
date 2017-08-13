@@ -1,7 +1,7 @@
 <?php
 
 /**
- * DuelsCore – DuelManager.php
+ * DuelsCore – ArenaManager.php
  *
  * Copyright (C) 2017 Jack Noordhuis
  *
@@ -12,24 +12,21 @@
  *
  * @author Jack Noordhuis
  *
- * Created on 24/5/17 at 9:04 PM
+ * Created on 7/7/17 at 5:55 PM
  *
  */
 
-namespace duelscore\duel;
+namespace duelscore\arena;
 
 use duelscore\DuelsCore;
 
-class DuelManager {
+class ArenaManager {
 
 	/** @var DuelsCore */
 	private $plugin;
 
-	/** @var array */
-	private $duels = [];
-
-	/** @var bool */
-	private $closed = false;
+	/** @var Arena[] */
+	private $arenas = [];
 
 	public function __construct(DuelsCore $plugin) {
 		$this->plugin = $plugin;
@@ -40,29 +37,6 @@ class DuelManager {
 	 */
 	public function getPlugin() : DuelsCore {
 		return $this->plugin;
-	}
-
-	/**
-	 * Tick all active duels and remove all inactive ones
-	 */
-	public function tickDuels() {
-		foreach($this->duels as $id => $duel) {
-			if($duel instanceof Duel and $duel->isActive()) {
-				$duel->tick();
-			} else {
-				unset($this->duels[$id]);
-			}
-		}
-	}
-
-	public function __destruct() {
-		$this->close();
-	}
-
-	public function close() {
-		if(!$this->closed) {
-
-		}
 	}
 
 }

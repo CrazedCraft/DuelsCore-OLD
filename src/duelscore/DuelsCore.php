@@ -26,8 +26,16 @@ class DuelsCore extends PluginBase {
 	/** @var DuelManager */
 	private $duelManager;
 
+	/** Resource files & paths */
+	const SETTINGS_FILE = "Settings.yml";
+	const ERROR_REPORT_LOG = "error_log.json";
+
 	public function onEnable() {
 		$this->setDuelManager();
+	}
+
+	private function loadConfigs() {
+		$this->saveResource(self:)
 	}
 
 	public function getDuelManager() : DuelManager {
