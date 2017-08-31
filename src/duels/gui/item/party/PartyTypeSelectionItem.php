@@ -26,6 +26,8 @@ use pocketmine\item\Item;
 
 class PartyTypeSelectionItem extends GUIItem {
 
+	const GUI_ITEM_ID = "party_type_gui_selector";
+
 	/** @var string */
 	private $duelType = "";
 
@@ -34,6 +36,7 @@ class PartyTypeSelectionItem extends GUIItem {
 		parent::__construct($item, $parent);
 		if($name !== "") {
 			$this->setCustomName(Utils::translateColors($name));
+			$this->setPreviewName($this->getName());
 		}
 	}
 
@@ -43,10 +46,6 @@ class PartyTypeSelectionItem extends GUIItem {
 
 	public function setDuelType(string $value) {
 		$this->duelType = $value;
-	}
-
-	public function getCooldown() : int {
-		return 0;
 	}
 
 }

@@ -61,10 +61,10 @@ class PartyEventSelectionContainer extends ChestGUI {
 	}
 
 	public function onSelect($slot, GUIItem $item, CorePlayer $player) {
+		$player->removeWindow($this);
 		if(!$item instanceof PartyTypeSelectionItem) {
 			throw new \InvalidArgumentException("Expected duels/gui/item/party/PartyTypeSelectionItem, got " . gettype($item) . " instead");
 		}
-		$player->removeWindow($this);
 		$plugin = Main::getInstance();
 		/** @var $session PlayerSession */
 		if(!($session = $plugin->sessionManager->get($player->getName())) instanceof PlayerSession) {
@@ -75,21 +75,21 @@ class PartyEventSelectionContainer extends ChestGUI {
 			$type = $item->getDuelType();
 			switch($type) {
 				case Duel::TYPE_1V1:
-					if(count($session->getParty()->getPlayers()) === 2) {
+					if(count($session->getParty()->getPlayers()) <= 2) {
 						$player->sendMessage(Utils::translateColors("&aStarting party 1v1 event..."));
 						$session->lastSelectedPartyType = $item->getDuelType();
 						$player->addWindow($player->getGuiContainer(Main::GUI_PARTY_KIT_SELECTION_CONTAINER));
 					} else {
-						$player->sendMessage(Utils::translateColors("&cThere must be two players in the party to start a 1v1 event!"));
+						$player->sendMessage(Utils::translateColors("&cThere can't be more than two players in the party to start a 1v1 event!"));
 					}
 					return false;
 				case Duel::TYPE_2V2:
-					if(count($session->getParty()->getPlayers()) === 4) {
+					if(count($session->getParty()->getPlayers()) <= 4) {
 						$player->sendMessage(Utils::translateColors("&aStarting party 2v2 event..."));
 						$session->lastSelectedPartyType = $item->getDuelType();
 						$player->addWindow($player->getGuiContainer(Main::GUI_PARTY_KIT_SELECTION_CONTAINER));
 					} else {
-						$player->sendMessage(Utils::translateColors("&cThere must be four players in the party to start a 2v2 event!"));
+						$player->sendMessage(Utils::translateColors("&cThere can't be more than four players in the party to start a 2v2 event!"));
 					}
 					return false;
 				case Duel::TYPE_FFA:

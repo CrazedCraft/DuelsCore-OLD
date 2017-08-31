@@ -48,10 +48,10 @@ class KitSelectionContainer extends ChestGUI {
 	}
 
 	public function onSelect($slot, GUIItem $item, CorePlayer $player) {
+		$player->removeWindow($this);
 		if(!$item instanceof KitGUIItem) {
 			throw new \InvalidArgumentException("Expected duels/gui/item/kit/KitGUIItem, got core/gui/item/GUIItem instead");
 		}
-		$player->removeWindow($this);
 		$plugin = Main::getInstance();
 		/** @var $session PlayerSession */
 		if(!($session = $plugin->sessionManager->get($player->getName())) instanceof PlayerSession) {

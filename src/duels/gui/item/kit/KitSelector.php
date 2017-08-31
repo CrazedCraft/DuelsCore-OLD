@@ -19,9 +19,12 @@ use pocketmine\utils\TextFormat as TF;
 
 class KitSelector extends GUIItem {
 
+	const GUI_ITEM_ID = "play_gui_item";
+
 	public function __construct($parent = null) {
 		parent::__construct(Item::get(Item::DIAMOND_SWORD, 0, 1), $parent);
 		$this->setCustomName(LanguageUtils::translateColors("&l&6Play"));
+		$this->setPreviewName($this->getName());
 	}
 
 	public function onClick(CorePlayer $player) {
@@ -39,7 +42,7 @@ class KitSelector extends GUIItem {
 	}
 
 	public function getCooldown() : int {
-		return 1; // in seconds
+		return 3; // in seconds
 	}
 
 }

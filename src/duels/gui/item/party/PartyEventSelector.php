@@ -32,9 +32,12 @@ use pocketmine\utils\TextFormat as TF;
 
 class PartyEventSelector extends GUIItem {
 
+	const GUI_ITEM_ID = "party_event_gui_item";
+
 	public function __construct($parent = null) {
 		parent::__construct(Item::get(Item::BOOK, 0, 1), $parent);
 		$this->setCustomName(LanguageUtils::translateColors("&l&eStart party event"));
+		$this->setPreviewName($this->getName());
 	}
 
 	public function onClick(CorePlayer $player) {
@@ -62,12 +65,8 @@ class PartyEventSelector extends GUIItem {
 		}
 	}
 
-	public function getPreviewDescription(CorePlayer $player) : string {
-		return LanguageUtils::translateColors("&o&7Tap the item on the ground to use.");
-	}
-
 	public function getCooldown() : int {
-		return 5; // in seconds
+		return 3; // in seconds
 	}
 
 }

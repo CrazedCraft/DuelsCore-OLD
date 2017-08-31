@@ -19,6 +19,7 @@ class ServerSelector extends GUIItem {
 	public function __construct($parent = null) {
 		parent::__construct(Item::get(Item::COMPASS, 0, 1), $parent);
 		$this->setCustomName(LanguageUtils::translateColors("&l&dServer Selector"));
+		$this->setPreviewName($this->getName());
 	}
 
 	public function onClick(CorePlayer $player) {
@@ -26,7 +27,7 @@ class ServerSelector extends GUIItem {
 	}
 
 	public function getCooldown() : int {
-		return 1; // in seconds
+		return 5; // in seconds
 	}
 
 }

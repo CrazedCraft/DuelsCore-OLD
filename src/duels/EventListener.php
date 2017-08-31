@@ -24,7 +24,6 @@ use pocketmine\event\player\PlayerJoinEvent;
 use pocketmine\event\player\PlayerKickEvent;
 use pocketmine\event\player\PlayerLoginEvent;
 use pocketmine\event\player\PlayerQuitEvent;
-use pocketmine\event\player\PlayerRespawnEvent;
 use pocketmine\event\server\DataPacketReceiveEvent;
 use pocketmine\event\server\QueryRegenerateEvent;
 use pocketmine\item\Item;
@@ -93,7 +92,6 @@ class EventListener implements Listener {
 	//		}
 	//	}
 	//}
-
 	public function onDamage(EntityDamageEvent $event) {
 		$victim = $event->getEntity();
 		if($victim instanceof Player) {
@@ -131,8 +129,8 @@ class EventListener implements Listener {
 									}
 									break;
 								case EntityDamageEvent::CAUSE_FALL:
-									$message = TF::BOLD . TF::AQUA . $victim->getName() . TF::RESET . TF::LIGHT_PURPLE . " thought they could soar like an eagle!";
-									break;
+									//$message = TF::BOLD . TF::AQUA . $victim->getName() . TF::RESET . TF::LIGHT_PURPLE . " thought they could soar like an eagle!";
+									return;
 								case EntityDamageEvent::CAUSE_DROWNING:
 									$message = TF::BOLD . TF::AQUA . $victim->getName() . TF::RESET . TF::YELLOW . " thought they were a fish!";
 									break;
@@ -150,7 +148,10 @@ class EventListener implements Listener {
 							$session->getDuel()->broadcast($message);
 							$session->getDuel()->handleDeath($victim);
 						} else {
-
+							if($event->getCause() === EntityDamageEvent::CAUSE_FALL) {
+								$event->setCancelled(true);
+								return;
+							}
 						}
 					} else {
 						$event->setCancelled(true);
@@ -380,13 +381,14 @@ class EventListener implements Listener {
 		$player = $event->getPlayer();
 		/** @var Item $slot */
 		$slot = clone $event->getItem();
-		if($slot->getId() == Item::AIR) return;
+		if($slot->getId() == Item::AIR)
+			return;
 		$session = $this->plugin->sessionManager->get($player->getName());
 		if($session instanceof PlayerSession) {
 			if($session->getStatus() == PlayerSession::STATUS_WAITING) {
 				if($player->isAuthenticated()) {
-					if($slot instanceof DuelKitRequestSelector) $event->setCancelled();
-
+					if($slot instanceof DuelKitRequestSelector)
+						$event->setCancelled();
 				} else {
 					$player->sendTip(TF::RED . "Please authenticate first!");
 					$event->setCancelled();
@@ -425,14 +427,14 @@ class EventListener implements Listener {
 	//		$event->setCancelled(true);
 	//	}
 	//}
-
 	public function onExplode(EntityExplodeEvent $event) {
 		$event->setBlockList([Block::get(0)]);
 	}
 
 	public function onLaunch(ProjectileLaunchEvent $event) {
 		$player = $event->getEntity();
-		if(!$player instanceof Player) return;
+		if(!$player instanceof Player)
+			return;
 		$session = $this->plugin->sessionManager->get($player->getName());
 		if($session instanceof PlayerSession) {
 			if($session->getStatus() !== PlayerSession::STATUS_PLAYING) {

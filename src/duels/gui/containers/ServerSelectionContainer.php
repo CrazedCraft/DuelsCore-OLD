@@ -12,6 +12,7 @@ namespace duels\gui\containers;
 use core\CorePlayer;
 use core\gui\container\ChestGUI;
 use core\gui\item\GUIItem;
+use duels\gui\item\serverselectors\ClassicPrisonServerSelector;
 use duels\gui\item\serverselectors\ClassicPvPServerSelector;
 use duels\gui\item\serverselectors\DuelsServerSelector;
 use pocketmine\inventory\BaseInventory;
@@ -26,7 +27,9 @@ class ServerSelectionContainer extends ChestGUI {
 	public function __construct(CorePlayer $owner) {
 		parent::__construct($owner);
 		$this->defaultContents[] = new DuelsServerSelector($this);
+		$this->defaultContents[] = new DuelsServerSelector($this, 2);
 		$this->defaultContents[] = new ClassicPvPServerSelector($this);
+		$this->defaultContents[] = new ClassicPrisonServerSelector($this);
 		$this->setContents($this->defaultContents);
 	}
 
@@ -43,8 +46,8 @@ class ServerSelectionContainer extends ChestGUI {
 	}
 
 	public function onSelect($slot, GUIItem $item, CorePlayer $player) {
-		$item->onClick($player);
 		$player->removeWindow($this);
+		$item->onClick($player);
 		return false; // don't remove the item
 	}
 

@@ -16,17 +16,17 @@ use pocketmine\item\Item;
 
 class DuelKitRequestSelector extends GUIItem {
 
+	const GUI_ITEM_ID = "duel_request_selector";
+
 	public function __construct($parent = null) {
 		parent::__construct(Item::get(Item::STICK, 0, 1), $parent);
 		$this->setCustomName(LanguageUtils::translateColors("&l&aDuel Stick"));
+		$this->setPreviewName($this->getName());
+		$this->setPreviewDescription(LanguageUtils::translateColors("&o&7Tap the item on a player to use."));
 	}
 
 	public function onClick(CorePlayer $player) {
 		$player->addWindow($player->getGuiContainer(Main::GUI_DUEL_SELECTION_CONTAINER));
-	}
-
-	public function getPreviewDescription(CorePlayer $player) : string {
-		return LanguageUtils::translateColors("&o&7Tap the item on a player to use.");
 	}
 
 	public function getCooldown() : int {
