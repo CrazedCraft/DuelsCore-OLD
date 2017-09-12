@@ -29,6 +29,7 @@ use duels\rank\RankManager;
 use duels\session\SessionManager;
 use duels\tasks\SessionCleanupTask;
 use duels\tasks\UpdateInfoTextTask;
+use duels\ui\UIManager;
 use pocketmine\block\SignPost;
 use pocketmine\item\Item;
 use pocketmine\level\Position;
@@ -72,6 +73,9 @@ class Main extends PluginBase {
 	/** @var PartyManager */
 	public $partyManager;
 
+	/** @var UIManager */
+	public $UIManager;
+
 	/** @var array */
 	public $needAuth = [];
 
@@ -105,6 +109,7 @@ class Main extends PluginBase {
 	}
 
 	public function onEnable() {
+		self::$instance = $this;
 		//$this->lobbyBossBar = new BossBar();
 		//$this->lobbyBossBar->setText(LanguageUtils::translateColors("&l&eWelcome to &1C&ar&ea&6z&9e&5d&fC&7r&6a&cf&dt &6Duels&r"));
 		$this->getServer()->setAutoSave(false);
@@ -122,13 +127,13 @@ class Main extends PluginBase {
 		$this->setDuelManager();
 		$this->setKitManager();
 		$this->setPartyManager();
+		$this->setUIManager();
 		$this->getServer()->getNetwork()->setName(LanguageUtils::translateColors("&1C&ar&ea&6z&9e&5d&fC&7r&6a&cf&dt &l&6Duels&r"));
 		$this->getServer()->getNetwork()->updateName();
 		$this->getCommand("duel")->setExecutor(new DuelCommand($this));
 		$this->getCommand("hub")->setExecutor(new HubCommand($this));
 		$this->getCommand("party")->setExecutor(new PartyCommand($this));
 		$this->sessionCleanup = new SessionCleanupTask($this);
-		self::$instance = $this;
 		$this->spawnInfoText();
 	}
 
@@ -235,6 +240,14 @@ class Main extends PluginBase {
 	public function setPartyManager() {
 		if(isset($this->partyManager) and $this->partyManager instanceof PartyManager) return;
 		$this->partyManager = new PartyManager($this);
+	}
+
+	public function getUIManager() : UIManager {
+		return $this->UIManager;
+	}
+
+	public function setUIManager() {
+		$this->UIManager = new UIManager($this);
 	}
 
 	public function getPlayingCount($type) {

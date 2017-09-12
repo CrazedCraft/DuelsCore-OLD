@@ -14,7 +14,9 @@ use core\gui\item\GUIItem;
 use core\language\LanguageUtils;
 use duels\Main;
 use duels\session\PlayerSession;
+use duels\ui\windows\PlayKitSelectionForm;
 use pocketmine\item\Item;
+use pocketmine\network\protocol\Info;
 use pocketmine\utils\TextFormat as TF;
 
 class KitSelector extends GUIItem {
@@ -35,7 +37,11 @@ class KitSelector extends GUIItem {
 			return;
 		}
 		if(!$session->inParty()) {
-			$player->addWindow($player->getGuiContainer(Main::GUI_KIT_SELECTION_CONTAINER));
+			if($player->getPlayerProtocol() >= Info::PROTOCOL_120) {
+				$player->showModal($plugin->getUIManager()->getForm(PlayKitSelectionForm::FORM_UI_ID));
+			} else {
+				$player->addWindow($player->getGuiContainer(Main::GUI_KIT_SELECTION_CONTAINER));
+			}
 		} else {
 			$player->sendMessage(TF::RED . "You must use the party event item or the NPC's to play duels while in a party!");
 		}

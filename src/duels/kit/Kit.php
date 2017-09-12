@@ -27,7 +27,10 @@ class Kit {
 	/** @var Item[] */
 	private $armor = [];
 
-	public function __construct(string $name, Item $displayItem, string $type, string $description, array $items, array $armor) {
+	/** @var string */
+	private $imageFile = "";
+
+	public function __construct(string $name, Item $displayItem, string $type, string $description, array $items, array $armor, string $imageFile = "0-0.png") {
 		$this->name = $name;
 		$displayItem->setCustomName($name . " Kit");
 		$tag = $displayItem->getNamedTag();
@@ -38,6 +41,7 @@ class Kit {
 		$this->description = $description;
 		$this->items = $items;
 		$this->armor = $armor;
+		$this->imageFile = $imageFile;
 	}
 
 	public function getName() {
@@ -66,6 +70,10 @@ class Kit {
 
 	public function getArmor() {
 		return $this->armor;
+	}
+
+	public function getImageFile() {
+		return $this->imageFile;
 	}
 
 }

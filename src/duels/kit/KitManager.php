@@ -36,6 +36,7 @@ class KitManager {
 			[
 				"name" => TF::BOLD . TF::DARK_AQUA . "Random",
 				"display-item" => Item::get(Item::DIAMOND_AXE),
+				"image-file" => "279-0.png",
 				"type" => "random_kit",
 				"description" => TF::ITALIC . TF::GRAY . "Tap on the ground to pick a random kit!",
 				"items" => [],
@@ -44,6 +45,7 @@ class KitManager {
 			[
 				"name" => TF::BOLD . TF::GREEN . "UHC",
 				"display-item" => Item::get(Item::GOLDEN_APPLE),
+				"image-file" => "322-0.png",
 				"type" => "kit_select",
 				"items" => [
 					self::getEnchantedItem(Item::get(Item::DIAMOND_SWORD), [Enchantment::getEnchantment(Enchantment::TYPE_WEAPON_SHARPNESS)->setLevel(5)]),
@@ -64,6 +66,7 @@ class KitManager {
 			[
 				"name" => TF::BOLD . TF::GREEN . "Archer",
 				"display-item" => Item::get(Item::BOW),
+				"image-file" => "261-0.png",
 				"type" => "kit_select",
 				"items" => [
 					self::getEnchantedItem(Item::get(Item::BOW), [Enchantment::getEnchantment(Enchantment::TYPE_BOW_KNOCKBACK)->setLevel(2), Enchantment::getEnchantment(Enchantment::TYPE_BOW_INFINITY)]),
@@ -83,6 +86,7 @@ class KitManager {
 			[
 				"name" => TF::BOLD . TF::GREEN . "Combo",
 				"display-item" => Item::get(Item::PUFFERFISH),
+				"image-file" => "349-3.png",
 				"type" => "kit_select",
 				"items" => [
 					self::getEnchantedItem(Item::get(Item::DIAMOND_SWORD), [Enchantment::getEnchantment(Enchantment::TYPE_WEAPON_SHARPNESS)->setLevel(2), Enchantment::getEnchantment(Enchantment::TYPE_WEAPON_FIRE_ASPECT)->setLevel(2), Enchantment::getEnchantment(Enchantment::TYPE_MINING_DURABILITY)->setLevel(10)]),
@@ -104,6 +108,7 @@ class KitManager {
 			[
 				"name" => TF::BOLD . TF::GREEN . "Gapple",
 				"display-item" => Item::get(Item::ENCHANTED_GOLDEN_APPLE),
+				"image-file" => "466-0.gif",
 				"type" => "kit_select",
 				"items" => [
 					self::getEnchantedItem(Item::get(Item::DIAMOND_SWORD), [Enchantment::getEnchantment(Enchantment::TYPE_WEAPON_SHARPNESS)->setLevel(5), Enchantment::getEnchantment(Enchantment::TYPE_WEAPON_FIRE_ASPECT)->setLevel(2), Enchantment::getEnchantment(Enchantment::TYPE_MINING_DURABILITY)->setLevel(3)]),
@@ -122,6 +127,7 @@ class KitManager {
 			[
 				"name" => TF::BOLD . TF::GREEN . "Diamond",
 				"display-item" => Item::get(Item::DIAMOND_HELMET),
+				"image-file" => "310-0.png",
 				"type" => "kit_select",
 				"items" => [
 					Item::get(Item::DIAMOND_SWORD),
@@ -141,6 +147,7 @@ class KitManager {
 			[
 				"name" => TF::BOLD . TF::GREEN . "Iron",
 				"display-item" => Item::get(Item::IRON_HELMET),
+				"image-file" => "306-0.png",
 				"type" => "kit_select",
 				"items" => [
 					Item::get(Item::IRON_SWORD),
@@ -161,6 +168,7 @@ class KitManager {
 			[
 				"name" => TF::BOLD . TF::GREEN . "SG",
 				"display-item" => Item::get(Item::FISHING_ROD),
+				"image-file" => "346-0.png",
 				"type" => "kit_select",
 				"items" => [
 					Item::get(272, 0, 1),
@@ -181,6 +189,7 @@ class KitManager {
 			[
 				"name" => TF::BOLD . TF::GREEN . "Iron Soup",
 				"display-item" => Item::get(Item::MUSHROOM_STEW),
+				"image-file" => "282-0.png",
 				"type" => "kit_select",
 				"items" => [
 					self::getEnchantedItem(Item::get(Item::DIAMOND_SWORD), [Enchantment::getEnchantment(Enchantment::TYPE_WEAPON_SHARPNESS)->setLevel(3)]),
@@ -213,6 +222,7 @@ class KitManager {
 			[
 				"name" => TF::BOLD . TF::GREEN . "Axe",
 				"display-item" => Item::get(Item::IRON_AXE),
+				"image-file" => "258-0.png",
 				"type" => "kit_select",
 				"items" => [
 					self::getEnchantedItem(Item::get(Item::IRON_AXE), [Enchantment::getEnchantment(Enchantment::TYPE_WEAPON_SHARPNESS)]),
@@ -238,7 +248,7 @@ class KitManager {
 
 	protected function registerKits() {
 		foreach($this->data as $kit) {
-			$this->add($kit["name"], $kit["display-item"], $kit["type"], (isset($kit["description"]) ? $kit["description"] : "Tap on the ground to join the queue!"), $kit["items"], $kit["armor"]);
+			$this->add($kit["name"], $kit["display-item"], $kit["type"], (isset($kit["description"]) ? $kit["description"] : "Tap on the ground to join the queue!"), $kit["items"], $kit["armor"], $kit["image-file"]);
 		}
 	}
 
@@ -251,11 +261,12 @@ class KitManager {
 	 * @param string $description
 	 * @param array $items
 	 * @param array $armor
+	 * @param string $imageFile
 	 */
-	public function add(string $name, Item $displayItem, string $type, string $description, array $items, array $armor) {
+	public function add(string $name, Item $displayItem, string $type, string $description, array $items, array $armor, string $imageFile = "0-0") {
 		$class = ($type === "kit_select" ? "duels\\kit\\Kit" : "duels\\kit\\RandomKit");
 		/** @var Kit|RandomKit $kit */
-		$kit = new $class($name, $displayItem, $type, $description, $items, $armor);
+		$kit = new $class($name, $displayItem, $type, $description, $items, $armor, $imageFile);
 		$this->kits[$kit->getName()] = $kit;
 		$this->displayItems[$kit->getName()] = $kit->getDisplayItem();
 		if($type === "kit_select") {
@@ -293,6 +304,13 @@ class KitManager {
 
 	public function findRandom() : Kit {
 		return $this->realKits[array_rand($this->realKits)];
+	}
+
+	/**
+	 * @return Kit[]
+	 */
+	public function getAll() : array {
+		return $this->kits;
 	}
 
 	/**
