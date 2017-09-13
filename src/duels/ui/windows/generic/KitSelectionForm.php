@@ -20,7 +20,6 @@ namespace duels\ui\windows\generic;
 
 use duels\Main;
 use duels\ui\elements\generic\KitSelectionButton;
-use pocketmine\customUI\windows\CustomForm;
 use pocketmine\customUI\windows\SimpleForm;
 
 abstract class KitSelectionForm extends SimpleForm {

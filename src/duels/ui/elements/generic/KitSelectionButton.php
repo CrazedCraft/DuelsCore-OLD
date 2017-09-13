@@ -20,7 +20,6 @@ namespace duels\ui\elements\generic;
 
 use duels\kit\Kit;
 use duels\Main;
-use pocketmine\customUI\elements\customForm\Label;
 use pocketmine\customUI\elements\simpleForm\Button;
 
 abstract class KitSelectionButton extends Button {
@@ -28,10 +27,10 @@ abstract class KitSelectionButton extends Button {
 	/** @var string */
 	private $kitName = "";
 
-	public function __construct(Kit $kit, string $imgFile = "0-0.png") {
+	public function __construct(Kit $kit) {
 		$this->kitName = $kit->getName();
 		parent::__construct($kit->getDisplayName() . " Kit");
-		//$this->addImage(Button::IMAGE_TYPE_URL, "http://jacknoordhuis.net/minecraft/icons/items/{$imgFile}");
+		$this->addImage(Button::IMAGE_TYPE_URL, "http://jacknoordhuis.net/minecraft/icons/items/{$kit->getImageFile()}");
 	}
 
 	/**

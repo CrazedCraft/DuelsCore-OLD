@@ -12,7 +12,9 @@ use core\CorePlayer;
 use core\gui\item\GUIItem;
 use core\language\LanguageUtils;
 use duels\Main;
+use duels\ui\windows\DefaultServerSelectionForm;
 use pocketmine\item\Item;
+use pocketmine\network\protocol\Info;
 
 class ServerSelector extends GUIItem {
 
@@ -23,7 +25,11 @@ class ServerSelector extends GUIItem {
 	}
 
 	public function onClick(CorePlayer $player) {
-		$player->addWindow($player->getGuiContainer(Main::GUI_SERVER_SELECTION_CONTAINER));
+		if($player->getPlayerProtocol() >= Info::PROTOCOL_120) {
+			$player->showModal(Main::getInstance()->getUIManager()->getForm(DefaultServerSelectionForm::FORM_UI_ID));
+		} else {
+			$player->addWindow($player->getGuiContainer(Main::GUI_SERVER_SELECTION_CONTAINER));
+		}
 	}
 
 	public function getCooldown() : int {
