@@ -19,25 +19,38 @@
 namespace duels;
 
 use core\CorePlayer;
+use core\gui\item\GUIItem;
+use pocketmine\event\entity\EntityDamageEvent;
+use pocketmine\event\player\PlayerInteractEvent;
+use pocketmine\utils\TextFormat;
 
 class DuelsPlayer extends CorePlayer {
+	//
+	///** @var string */
+	//private $lastTappedPLayerUuid = "";
+	//
+	///** @var int */
+	//private $lastSelectedKitId = -1;
+	//
+	///** @var bool */
+	//private $requestStatus = true;
+	//
+	///** @var array */
+	//private $requestIds = [];
+	//
+	///** @var int */
+	//private $duelId = -1;
+	//
+	///** @var int */
+	//private $lasSelectedPartyType = -1;
 
-	/** @var string */
-	private $lastTappedPLayerUuid = "";
+	public function attack($damage, EntityDamageEvent $source) {
+		$v = parent::attack($damage, $source);
 
-	/** @var int */
-	private $lastSelectedKitId = -1;
-
-	/** @var bool */
-	private $requestStatus = true;
-
-	/** @var array */
-	private $requestIds = [];
-
-	/** @var int */
-	private $duelId = -1;
-
-	/** @var int */
-	private $lasSelectedPartyType = -1;
+		if($source->isCancelled()) {
+			Main::getInstance()->listener->onDamage($source);
+		}
+		return $v;
+	}
 
 }

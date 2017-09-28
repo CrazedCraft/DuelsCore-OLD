@@ -49,6 +49,9 @@ class Main extends PluginBase {
 	/** @var Main */
 	public static $instance = null;
 
+	/** @var EventListener */
+	public $listener;
+
 	/** @var AuthDatabase */
 	public $authDatabase;
 
@@ -119,7 +122,7 @@ class Main extends PluginBase {
 		$level->setAutoSave(false);
 		Main::$spawnCoords = new Vector3(0.5, 93, 0.5);
 		$this->setLobbyItems();
-		$this->getServer()->getPluginManager()->registerEvents(new EventListener($this), $this);
+		$this->getServer()->getPluginManager()->registerEvents($this->listener = new EventListener($this), $this);
 		$this->loadConfigs();
 		$this->setSessionManager();
 		$this->setArenaManager();

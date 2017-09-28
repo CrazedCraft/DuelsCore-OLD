@@ -295,6 +295,10 @@ class Duel {
 
 	public function removePlayer($name) {
 		unset($this->players[$name]);
+		$p = $this->plugin->getServer()->getPlayer($name);
+		if($p instanceof CorePlayer) {
+			$p->setStatus(CorePlayer::STATE_LOBBY);
+		}
 	}
 
 	public function broadcast($message) {

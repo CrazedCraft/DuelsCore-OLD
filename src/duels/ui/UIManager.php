@@ -20,8 +20,10 @@ namespace duels\ui;
 
 use core\language\LanguageUtils;
 use duels\Main;
+use duels\ui\elements\DuelRequestKitSelectionButton;
 use duels\ui\elements\PlayKitSelectionButton;
 use duels\ui\windows\DefaultServerSelectionForm;
+use duels\ui\windows\DuelRequestKitSelectionForm;
 use duels\ui\windows\PlayKitSelectionForm;
 use pocketmine\customUI\CustomUI;
 
@@ -41,6 +43,7 @@ class UIManager {
 
 	protected function registerDefaults() {
 		$this->registerForm(new PlayKitSelectionForm(LanguageUtils::translateColors("&l&eSelect a kit to play"), PlayKitSelectionButton::class), PlayKitSelectionForm::FORM_UI_ID);
+		$this->registerForm(new DuelRequestKitSelectionForm(LanguageUtils::translateColors("&l&eSelect a kit"), DuelRequestKitSelectionButton::class), DuelRequestKitSelectionForm::FORM_UI_ID);
 		$this->registerForm(new DefaultServerSelectionForm(), DefaultServerSelectionForm::FORM_UI_ID);
 	}
 

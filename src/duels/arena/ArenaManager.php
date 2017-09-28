@@ -18,7 +18,6 @@ class ArenaManager {
 	public function __construct(Main $plugin) {
 		$this->plugin = $plugin;
 		$this->loadArenas();
-		var_dump(count($this->arenas));
 	}
 
 	public function loadArenas() {

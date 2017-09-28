@@ -40,7 +40,7 @@ class NPCManager {
 			$this->NPCs[] = $entity;
 			$chunk->allowUnload = false;
 //			$skin = Skin::get($this->plugin->getDataFolder() . "skins" . DIRECTORY_SEPARATOR, "default");
-			$entity->setCustomName($this->data[$key]["name"]);
+			$entity->setCustomName($nbt["CustomName"]);
 			$entity->showPlaying(0);
 //			$entity->setSkin($skin["skin"], "Standard_Custom");
 			$entity->spawnToAll();
@@ -51,17 +51,28 @@ class NPCManager {
 		$nbt = [];
 		foreach($this->data as $key => $data) {
 			if(is_file($this->plugin->getDataFolder() . "npcs" . DIRECTORY_SEPARATOR . TF::clean($data["name"]) . ".npc")) continue;
-			$nbt[$key] = new Compound("", ["Pos" => new Enum("Pos", [new DoubleTag("", $data["pos"]["x"]), new DoubleTag("", $data["pos"]["y"]), new DoubleTag("", $data["pos"]["z"])]),
+			$nbt[$key] = new Compound("", [
+				new Enum("Pos", [
+					new DoubleTag("", $data["pos"]["x"]),
+					new DoubleTag("", $data["pos"]["y"]),
+					new DoubleTag("", $data["pos"]["z"])
+				]),
 
-				"Motion" => new Enum("Motion", [new DoubleTag("", 0), new DoubleTag("", 0), new DoubleTag("", 0)]),
+				new Enum("Motion", [
+					new DoubleTag("", 0),
+					new DoubleTag("", 0), new DoubleTag("", 0)
+				]),
 
-				"Rotation" => new Enum("Rotation", [new FloatTag("", $data["rotation"]["yaw"]), new FloatTag("", $data["rotation"]["pitch"])]),
+				new Enum("Rotation", [
+					new FloatTag("", $data["rotation"]["yaw"]),
+					new FloatTag("", $data["rotation"]["pitch"])
+				]),
 
-				"CustomName" => new StringTag("CustomName", $data["name"]),
+				new StringTag("CustomName", $data["name"]),
 
-				"Health" => new ShortTag("Health", 20),
+				new ShortTag("Health", 20),
 
-				"Type" => new StringTag("Type", $data["type"])
+				new StringTag("Type", $data["type"])
 
 			]);
 		}

@@ -12,7 +12,9 @@ use core\CorePlayer;
 use core\gui\item\GUIItem;
 use core\language\LanguageUtils;
 use duels\Main;
+use duels\ui\windows\DuelRequestKitSelectionForm;
 use pocketmine\item\Item;
+use pocketmine\network\protocol\Info;
 
 class DuelKitRequestSelector extends GUIItem {
 
@@ -26,7 +28,12 @@ class DuelKitRequestSelector extends GUIItem {
 	}
 
 	public function onClick(CorePlayer $player) {
-		$player->addWindow($player->getGuiContainer(Main::GUI_DUEL_SELECTION_CONTAINER));
+		$plugin = Main::getInstance();
+		if($player->getPlayerProtocol() >= Info::PROTOCOL_120) {
+				$player->showModal($plugin->getUIManager()->getForm(DuelRequestKitSelectionForm::FORM_UI_ID));
+			} else {
+				$player->addWindow($player->getGuiContainer(Main::GUI_DUEL_SELECTION_CONTAINER));
+			}
 	}
 
 	public function getCooldown() : int {
