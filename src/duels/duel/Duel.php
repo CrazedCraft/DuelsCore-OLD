@@ -225,7 +225,6 @@ class Duel {
 				$p->spawnTo($opponent);
 				$p->getInventory()->sendContents($opponent);
 			}
-			$p->setFoodEnabled(true);
 			$p->setFood(20);
 			$this->plugin->sessionManager->get($p->getName())->setStatus(PlayerSession::STATUS_PLAYING);
 		}
@@ -314,7 +313,6 @@ class Duel {
 		//$this->bossBar->despawnFrom($victim);
 		$victim->removeAllEffects();
 		$victim->setHealth(20);
-		$victim->setFoodEnabled(false);
 		$victim->setFood(20);
 		$victim->getInventory()->sendContents($victim);
 		$victim->getInventory()->sendArmorContents($victim);

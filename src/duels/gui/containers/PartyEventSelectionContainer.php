@@ -29,7 +29,7 @@ use duels\Main;
 use duels\session\PlayerSession;
 use pocketmine\inventory\BaseInventory;
 use pocketmine\item\Item;
-use pocketmine\item\MobHead;
+use pocketmine\item\Skull;
 use pocketmine\network\protocol\ContainerClosePacket;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat as TF;
@@ -41,10 +41,10 @@ class PartyEventSelectionContainer extends ChestGUI {
 
 	public function __construct(CorePlayer $owner) {
 		parent::__construct($owner);
-		$this->defaultContents[] = new PartyTypeSelectionItem(Item::get(Item::MOB_HEAD, MobHead::STEVE, 1), Duel::TYPE_1V1, $this, "&l&b1v1");
-		$this->defaultContents[] = new PartyTypeSelectionItem(Item::get(Item::MOB_HEAD, MobHead::STEVE, 2), Duel::TYPE_2V2, $this, "&l&b2v2");
+		$this->defaultContents[] = new PartyTypeSelectionItem(Item::get(Item::MOB_HEAD, Skull::TYPE_HUMAN, 1), Duel::TYPE_1V1, $this, "&l&b1v1");
+		$this->defaultContents[] = new PartyTypeSelectionItem(Item::get(Item::MOB_HEAD, Skull::TYPE_HUMAN, 2), Duel::TYPE_2V2, $this, "&l&b2v2");
 		$this->defaultContents[] = Item::get(Item::AIR);
-		$this->defaultContents[] = new PartyTypeSelectionItem(Item::get(Item::MOB_HEAD, MobHead::DRAGON, 1), Duel::TYPE_FFA, $this, "&l&bFFA");
+		$this->defaultContents[] = new PartyTypeSelectionItem(Item::get(Item::MOB_HEAD, Skull::TYPE_DRAGON, 1), Duel::TYPE_FFA, $this, "&l&bFFA");
 		$this->setContents($this->defaultContents);
 	}
 

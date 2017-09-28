@@ -19,6 +19,7 @@ use pocketmine\event\entity\EntityExplodeEvent;
 use pocketmine\event\entity\ProjectileLaunchEvent;
 use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerDeathEvent;
+use pocketmine\event\player\PlayerExhaustEvent;
 use pocketmine\event\player\PlayerInteractEvent;
 use pocketmine\event\player\PlayerJoinEvent;
 use pocketmine\event\player\PlayerKickEvent;
@@ -50,6 +51,17 @@ class EventListener implements Listener {
 		$event->setServerName(Main::translateColors("&1C&ar&ea&6z&9e&5d&fC&7r&6a&cf&dt &l&6Duels&r"));
 	}
 
+	public function onExhaust(PlayerExhaustEvent $event) {
+		$player = $event->getPlayer();
+		/** @var PlayerSession $session */
+		$session = $this->plugin->sessionManager->get($player->getName());
+		if($session instanceof PlayerSession) {
+			if($session->getStatus() !== PlayerSession::STATUS_PLAYING) {
+				$event->setCancelled(true);
+			}
+		}
+	}
+
 	public function onLogin(PlayerLoginEvent $event) {
 		$event->getPlayer()->setSpawn(Main::$spawnCoords);
 		$event->getPlayer()->teleport(Main::$spawnCoords);
@@ -58,7 +70,6 @@ class EventListener implements Listener {
 	public function onJoin(PlayerJoinEvent $event) {
 		$event->setJoinMessage("");
 		$player = $event->getPlayer();
-		$player->setFoodEnabled(false);
 		$player->setFood(20);
 		$session = $this->plugin->sessionManager->get($player->getName());
 		if($session instanceof PlayerSession) {
@@ -101,7 +112,6 @@ class EventListener implements Listener {
 					if($session->getDuel()->getStatus() === Duel::STATUS_PLAYING) {
 						if($event->getFinalDamage() >= $victim->getHealth()) {
 							$event->setCancelled(true);
-							$victim->setFoodEnabled(false);
 							$cause = $victim->getLastDamageCause();
 							switch($cause === null ? EntityDamageEvent::CAUSE_CUSTOM : $cause->getCause()) {
 								case EntityDamageEvent::CAUSE_ENTITY_ATTACK:

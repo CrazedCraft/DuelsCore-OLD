@@ -7,7 +7,7 @@ use duels\Main;
 use pocketmine\inventory\PlayerInventory;
 use pocketmine\item\enchantment\Enchantment;
 use pocketmine\item\Item;
-use pocketmine\item\Potion;
+use pocketmine\item\food\Potion;
 use pocketmine\utils\TextFormat as TF;
 
 /**

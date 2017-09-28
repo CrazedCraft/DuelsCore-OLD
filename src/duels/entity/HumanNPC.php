@@ -31,7 +31,7 @@ class HumanNPC extends Human {
 		if($player !== $this and !isset($this->hasSpawned[$player->getId()])) {
 			$this->hasSpawned[$player->getId()] = $player;
 
-			$this->server->updatePlayerListData($this->getUniqueId(), $this->getId(), "", $player->getSkinName(), $player->getSkinData(), [$player]);
+			$this->server->updatePlayerListData($this->getUniqueId(), $this->getId(), "Standard_Custom", $player->getSkinName(), $player->getSkinData(), "", "", "", "", [$player]);
 
 			$pk = new AddPlayerPacket();
 			$pk->uuid = $this->getUniqueId();
