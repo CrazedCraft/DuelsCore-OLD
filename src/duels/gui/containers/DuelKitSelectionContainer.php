@@ -13,7 +13,6 @@ use core\gui\item\GUIItem;
 use duels\gui\item\kit\KitGUIItem;
 use duels\Main;
 use duels\session\PlayerSession;
-use pocketmine\network\protocol\ContainerClosePacket;
 use pocketmine\utils\TextFormat as TF;
 
 class DuelKitSelectionContainer extends KitSelectionContainer {

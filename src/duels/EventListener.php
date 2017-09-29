@@ -290,7 +290,7 @@ class EventListener implements Listener {
 	/**
 	 * @param PlayerInteractEvent $event
 	 *
-	 * @priority HIGHEST
+	 * @priority LOWEST
 	 */
 	public function onInteract(PlayerInteractEvent $event) {
 		$player = $event->getPlayer();

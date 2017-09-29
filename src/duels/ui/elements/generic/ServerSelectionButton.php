@@ -69,14 +69,16 @@ abstract class ServerSelectionButton extends Button {
 
 		if($server instanceof NetworkServer) {
 			if($server->getNetworkId() !== $currentServer->getNetworkId()) {
-				if($server->isAvailable()) {
+				if($server->isOnline() and time() - $server->getLastSyncTime() < 100) {
 					$player->transfer($server->getHost(), $server->getPort());
 				} else {
-					$player->sendMessage(LanguageUtils::translateColors("&c{$this->node}-{$node->getDisplay()}&6 is currently unavailable!"));
+					$player->sendMessage(LanguageUtils::translateColors("&c{$node->getName()}-{$this->serverId}&6 is currently unavailable!"));
 				}
 			} else {
 				$player->sendMessage(LanguageUtils::translateColors("&6You're currently connected to that server!"));
 			}
+		} elseif($this->node === $currentServer->getNode() and $this->serverId === $currentServer->getId()) {
+			$player->sendMessage(LanguageUtils::translateColors("&6You're currently connected to that server!"));
 		} else {
 			$player->sendMessage(LanguageUtils::translateColors("&6There are currently no &c{$node->getDisplay()}&6 servers online!"));
 		}

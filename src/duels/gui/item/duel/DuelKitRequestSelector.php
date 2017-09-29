@@ -30,10 +30,10 @@ class DuelKitRequestSelector extends GUIItem {
 	public function onClick(CorePlayer $player) {
 		$plugin = Main::getInstance();
 		if($player->getPlayerProtocol() >= Info::PROTOCOL_120) {
-				$player->showModal($plugin->getUIManager()->getForm(DuelRequestKitSelectionForm::FORM_UI_ID));
-			} else {
-				$player->addWindow($player->getGuiContainer(Main::GUI_DUEL_SELECTION_CONTAINER));
-			}
+			$player->showModal($plugin->getUIManager()->getForm(DuelRequestKitSelectionForm::FORM_UI_ID));
+		} else {
+			$player->addWindow($player->getGuiContainer(Main::GUI_DUEL_SELECTION_CONTAINER));
+		}
 	}
 
 	public function getCooldown() : int {

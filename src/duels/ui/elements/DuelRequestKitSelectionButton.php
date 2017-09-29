@@ -37,11 +37,15 @@ class DuelRequestKitSelectionButton extends KitSelectionButton {
 		$pSession = $sSession = $plugin->sessionManager->get($player->getName());
 		if($pSession instanceof PlayerSession) {
 			$entity = $pSession->lastTapped;
-			$eSession = $rSession = $plugin->sessionManager->get($entity->getName());
-			if($eSession instanceof PlayerSession) {
-				$pSession->lastSelectedKit = $this->getKit();
-				$rSession->addRequest($player, $entity, $this->getKit()->getDisplayName() . " Kit");
-				$player->sendMessage(TF::AQUA . "Sent a Duel request to " . TF::BOLD . TF::GREEN . $entity->getName() . TF::RESET . TF::AQUA . "!");
+			if($entity instanceof CorePlayer and $entity->isOnline()) {
+				$eSession = $rSession = $plugin->sessionManager->get($entity->getName());
+				if($eSession instanceof PlayerSession) {
+					$pSession->lastSelectedKit = $this->getKit();
+					$rSession->addRequest($player, $entity, $this->getKit()->getDisplayName() . " Kit");
+					$player->sendMessage(TF::AQUA . "Sent a Duel request to " . TF::BOLD . TF::GREEN . $entity->getName() . TF::RESET . TF::AQUA . "!");
+				}
+			} else {
+				$player->sendMessage(TF::RED . "Could not send duel request due to player being offline!");
 			}
 		}
 	}
