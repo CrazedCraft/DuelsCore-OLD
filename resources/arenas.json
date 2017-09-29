@@ -1,0 +1,506 @@
+[
+  {
+    "author": "JackNoordhuis",
+    "spawn-positions": [
+      "384, 1, -71",
+      "383, 1, -26"
+    ]
+  },
+  {
+    "author": "JackNoordhuis",
+    "spawn-positions": [
+      "384, 1, 25",
+      "383, 1, 70"
+    ]
+  },
+  {
+    "author": "JackNoordhuis",
+    "spawn-positions": [
+      "480, 1, -71",
+      "481, 1, -26"
+    ]
+  },
+  {
+    "author": "JackNoordhuis",
+    "spawn-positions": [
+      "480, 1, 25",
+      "481, 1, 70"
+    ]
+  },
+  {
+    "author": "JackNoordhuis",
+    "spawn-positions": [
+      "575, 1, -71",
+      "576, 1, -26"
+    ]
+  },
+  {
+    "author": "JackNoordhuis",
+    "spawn-positions": [
+      "575, 1, 25",
+      "576, 1, 70"
+    ]
+  },
+  {
+    "author": "JackNoordhuis",
+    "spawn-positions": [
+      "671, 1, -71",
+      "672, 1, -26"
+    ]
+  },
+  {
+    "author": "JackNoordhuis",
+    "spawn-positions": [
+      "671, 1, 25",
+      "672, 1, 70"
+    ]
+  },
+  {
+    "author": "JackNoordhuis",
+    "spawn-positions": [
+      "767, 1, -71",
+      "768, 1, -26"
+    ]
+  },
+  {
+    "author": "JackNoordhuis",
+    "spawn-positions": [
+      "767, 1, 25",
+      "768, 1, 70"
+    ]
+  },
+  {
+    "author": "JackNoordhuis",
+    "spawn-positions": [
+      "863, 1, -71",
+      "864, 1, -26"
+    ]
+  },
+  {
+    "author": "JackNoordhuis",
+    "spawn-positions": [
+      "863, 1, 25",
+      "864, 1, 70"
+    ]
+  },
+  {
+    "author": "JackNoordhuis",
+    "spawn-positions": [
+      "959, 1, -71",
+      "960, 1, -26"
+    ]
+  },
+  {
+    "author": "JackNoordhuis",
+    "spawn-positions": [
+      "959, 1, 25",
+      "960, 1, 70"
+    ]
+  },
+  {
+    "author": "JackNoordhuis",
+    "spawn-positions": [
+      "1055, 1, -71",
+      "1056, 1, -26"
+    ]
+  },
+  {
+    "author": "JackNoordhuis",
+    "spawn-positions": [
+      "1055, 1, 25",
+      "1056, 1, 70"
+    ]
+  },
+  {
+    "author": "JackNoordhuis",
+    "spawn-positions": [
+      "1151, 1, -71",
+      "1152, 1, -26"
+    ]
+  },
+  {
+    "author": "JackNoordhuis",
+    "spawn-positions": [
+      "1151, 1, 25",
+      "1152, 1, 70"
+    ]
+  },
+  {
+    "author": "JackNoordhuis",
+    "spawn-positions": [
+      "-65, 1, 361",
+      "-64, 1, 406"
+    ]
+  },
+  {
+    "author": "JackNoordhuis",
+    "spawn-positions": [
+      "47, 1, 361",
+      "48, 1, 406"
+    ]
+  },
+  {
+    "author": "JackNoordhuis",
+    "spawn-positions": [
+      "-65, 1, 457",
+      "-64, 1, 502"
+    ]
+  },
+  {
+    "author": "JackNoordhuis",
+    "spawn-positions": [
+      "47, 1, 457",
+      "48, 1, 406"
+    ]
+  },
+  {
+    "author": "JackNoordhuis",
+    "spawn-positions": [
+      "-65, 1, 553",
+      "-64, 1, 598"
+    ]
+  },
+  {
+    "author": "JackNoordhuis",
+    "spawn-positions": [
+      "47, 1, 553",
+      "48, 1, 598"
+    ]
+  },
+  {
+    "author": "JackNoordhuis",
+    "spawn-positions": [
+      "-65, 1, 649",
+      "-64, 1, 695"
+    ]
+  },
+  {
+    "author": "JackNoordhuis",
+    "spawn-positions": [
+      "47, 1, 649",
+      "48, 1, 695"
+    ]
+  },
+  {
+    "author": "JackNoordhuis",
+    "spawn-positions": [
+      "-65, 1, 745",
+      "-64, 1, 790"
+    ]
+  },
+  {
+    "author": "JackNoordhuis",
+    "spawn-positions": [
+      "47, 1, 745",
+      "48, 1, 790"
+    ]
+  },
+  {
+    "author": "JackNoordhuis",
+    "spawn-positions": [
+      "-65, 1, 841",
+      "-64, 1, 886"
+    ]
+  },
+  {
+    "author": "JackNoordhuis",
+    "spawn-positions": [
+      "47, 1, 841",
+      "48, 1, 886"
+    ]
+  },
+  {
+    "author": "JackNoordhuis",
+    "spawn-positions": [
+      "-65, 1, 937",
+      "-64, 1, 982"
+    ]
+  },
+  {
+    "author": "JackNoordhuis",
+    "spawn-positions": [
+      "47, 1, 937",
+      "48, 1, 982"
+    ]
+  },
+  {
+    "author": "JackNoordhuis",
+    "spawn-positions": [
+      "-65, 1, 1033",
+      "-64, 1, 1078"
+    ]
+  },
+  {
+    "author": "JackNoordhuis",
+    "spawn-positions": [
+      "47, 1, 1033",
+      "48, 1, 1078"
+    ]
+  },
+  {
+    "author": "JackNoordhuis",
+    "spawn-positions": [
+      "-65, 1, 1129",
+      "-64, 1, 1173"
+    ]
+  },
+  {
+    "author": "JackNoordhuis",
+    "spawn-positions": [
+      "47, 1, 1129",
+      "48, 1, 1173"
+    ]
+  },
+  {
+    "author": "JackNoordhuis",
+    "spawn-positions": [
+      "-401, 1, -71",
+      "-400, 1, -26"
+    ]
+  },
+  {
+    "author": "JackNoordhuis",
+    "spawn-positions": [
+      "-401, 1, 25",
+      "-400, 1, 70"
+    ]
+  },
+  {
+    "author": "JackNoordhuis",
+    "spawn-positions": [
+      "-497, 1, -71",
+      "-496, 1, -26"
+    ]
+  },
+  {
+    "author": "JackNoordhuis",
+    "spawn-positions": [
+      "-497, 1, 25",
+      "-496, 1, 70"
+    ]
+  },
+  {
+    "author": "JackNoordhuis",
+    "spawn-positions": [
+      "-593, 1, -71",
+      "-592, 1, -26"
+    ]
+  },
+  {
+    "author": "JackNoordhuis",
+    "spawn-positions": [
+      "-593, 1, 25",
+      "-592, 1, 70"
+    ]
+  },
+  {
+    "author": "JackNoordhuis",
+    "spawn-positions": [
+      "-689, 1, -71",
+      "-688, 1, -26"
+    ]
+  },
+  {
+    "author": "JackNoordhuis",
+    "spawn-positions": [
+      "-689, 1, 25",
+      "-688, 1, 70"
+    ]
+  },
+  {
+    "author": "JackNoordhuis",
+    "spawn-positions": [
+      "-785, 1, -71",
+      "-784, 1, -26"
+    ]
+  },
+  {
+    "author": "JackNoordhuis",
+    "spawn-positions": [
+      "-785, 1, 25",
+      "-784, 1, 70"
+    ]
+  },
+  {
+    "author": "JackNoordhuis",
+    "spawn-positions": [
+      "-881, 1, -71",
+      "-880, 1, -26"
+    ]
+  },
+  {
+    "author": "JackNoordhuis",
+    "spawn-positions": [
+      "-881, 1, 25",
+      "-880, 1, 70"
+    ]
+  },
+  {
+    "author": "JackNoordhuis",
+    "spawn-positions": [
+      "-977, 1, -71",
+      "-976, 1, -26"
+    ]
+  },
+  {
+    "author": "JackNoordhuis",
+    "spawn-positions": [
+      "-977, 1, 25",
+      "-976, 1, 70"
+    ]
+  },
+  {
+    "author": "JackNoordhuis",
+    "spawn-positions": [
+      "-1073, 1, -71",
+      "-1072, 1, -26"
+    ]
+  },
+  {
+    "author": "JackNoordhuis",
+    "spawn-positions": [
+      "-1073, 1, 25",
+      "-1072, 1, 70"
+    ]
+  },
+  {
+    "author": "JackNoordhuis",
+    "spawn-positions": [
+      "-1169, 1, -71",
+      "-1168, 1, -26"
+    ]
+  },
+  {
+    "author": "JackNoordhuis",
+    "spawn-positions": [
+      "-1169, 1, 25",
+      "-1168, 1, 70"
+    ]
+  },
+  {
+    "author": "JackNoordhuis",
+    "spawn-positions": [
+      "-64, 1, -362",
+      "-65, 1, -407"
+    ]
+  },
+  {
+    "author": "JackNoordhuis",
+    "spawn-positions": [
+      "48, 1, -362",
+      "49, 1, -407"
+    ]
+  },
+  {
+    "author": "JackNoordhuis",
+    "spawn-positions": [
+      "-64, 1, -458",
+      "-65, 1, -503"
+    ]
+  },
+  {
+    "author": "JackNoordhuis",
+    "spawn-positions": [
+      "48, 1, -458",
+      "49, 1, -503"
+    ]
+  },
+  {
+    "author": "JackNoordhuis",
+    "spawn-positions": [
+      "-64, 1, -554",
+      "-65, 1, -599"
+    ]
+  },
+  {
+    "author": "JackNoordhuis",
+    "spawn-positions": [
+      "48, 1, -554",
+      "49, 1, -599"
+    ]
+  },
+  {
+    "author": "JackNoordhuis",
+    "spawn-positions": [
+      "-64, 1, -650",
+      "-65, 1, -695"
+    ]
+  },
+  {
+    "author": "JackNoordhuis",
+    "spawn-positions": [
+      "48, 1, -650",
+      "49, 1, -695"
+    ]
+  },
+  {
+    "author": "JackNoordhuis",
+    "spawn-positions": [
+      "-64, 1, -746",
+      "-65, 1, -791"
+    ]
+  },
+  {
+    "author": "JackNoordhuis",
+    "spawn-positions": [
+      "48, 1, -746",
+      "49, 1, -191"
+    ]
+  },
+  {
+    "author": "JackNoordhuis",
+    "spawn-positions": [
+      "-64, 1, -842",
+      "-65, 1, -886"
+    ]
+  },
+  {
+    "author": "JackNoordhuis",
+    "spawn-positions": [
+      "48, 1, -842",
+      "49, 1, -886"
+    ]
+  },
+  {
+    "author": "JackNoordhuis",
+    "spawn-positions": [
+      "-64, 1, -938",
+      "-65, 1, -98"
+    ]
+  },
+  {
+    "author": "JackNoordhuis",
+    "spawn-positions": [
+      "348, 1, -938",
+      "49, 1, -983"
+    ]
+  },
+  {
+    "author": "JackNoordhuis",
+    "spawn-positions": [
+      "-64, 1, -1034",
+      "-65, 1, -1079"
+    ]
+  },
+  {
+    "author": "JackNoordhuis",
+    "spawn-positions": [
+      "48, 1, -1034",
+      "49, 1, -1079"
+    ]
+  },
+  {
+    "author": "JackNoordhuis",
+    "spawn-positions": [
+      "-64, 1, -1130",
+      "-65, 1, -1175"
+    ]
+  },
+  {
+    "author": "JackNoordhuis",
+    "spawn-positions": [
+      "48, 1, -1130",
+      "49, 1, -1175"
+    ]
+  }
+]
