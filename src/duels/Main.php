@@ -167,9 +167,9 @@ class Main extends PluginBase {
 	}
 
 	public function onDisable() {
-		foreach($this->getServer()->getOnlinePlayers() as $p) {
-			$p->kick(LanguageUtils::translateColors("&l&1C&ar&ea&6z&9e&5d&fC&7r&6a&cf&dt &6Duels&r &bwill be back in a moment!&r"), false);
-		}
+		//foreach($this->getServer()->getOnlinePlayers() as $p) {
+		//	$p->kick(LanguageUtils::translateColors("&l&1C&ar&ea&6z&9e&5d&fC&7r&6a&cf&dt &6Duels&r &bwill be back in a moment!&r"), false);
+		//}
 		$this->duelManager->close();
 		$this->partyManager->close();
 		$this->sessionManager->close();

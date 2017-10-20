@@ -19,6 +19,7 @@ namespace duels\ui\elements\generic;
 
 use core\CorePlayer;
 use core\language\LanguageUtils;
+use core\Main;
 use core\network\NetworkServer;
 use pocketmine\customUI\elements\simpleForm\Button;
 
@@ -35,7 +36,7 @@ abstract class ServerSelectionButton extends Button {
 	public function __construct(string $text, string $node, int $serverId = self::SERVER_ID_INVALID, string $imgFile = "0-0.png") {
 		$this->node = $node;
 		$this->serverId = $serverId;
-		parent::__construct(LanguageUtils::translateColors($text));
+		parent::__construct(LanguageUtils::translateColors($text . "&r"));
 		$this->addImage(Button::IMAGE_TYPE_URL, "http://jacknoordhuis.net/minecraft/icons/items/{$imgFile}");
 	}
 
@@ -51,6 +52,45 @@ abstract class ServerSelectionButton extends Button {
 	 */
 	public function getServerId() : int {
 		return $this->serverId;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getText() : string {
+		return $this->text . " " . $this->getOnlineStatus();
+	}
+
+	/**
+	 * Get the online status to be displayed in the button text
+	 *
+	 * @return string
+	 */
+	protected function getOnlineStatus() : string {
+		$networkManager = Main::getInstance()->getNetworkManager();
+		$currentServer = $networkManager->getMap()->getServer();
+		$node = $networkManager->getMap()->getNodes()[$this->node];
+		if($this->serverId !== self::SERVER_ID_INVALID) {
+			$server = $node->getServers()[$this->serverId];
+		} else {
+			$server = $node->getSuitableServer();
+		}
+
+		if($server instanceof NetworkServer) {
+			if($server->getNetworkId() !== $currentServer->getNetworkId()) {
+				if($server->isOnline() and time() - $server->getLastSyncTime() < 100) {
+					return LanguageUtils::translateColors("&7(&d{$server->getOnlinePlayers()}&0/&5{$server->getMaxPlayers()}&7)");
+				} else {
+					return LanguageUtils::translateColors("&7(&4offline&7)");
+				}
+			} else {
+				return LanguageUtils::translateColors("&7(&9Connected&7)");
+			}
+		} elseif($this->node === $currentServer->getNode() and $this->serverId === $currentServer->getId()) {
+			return LanguageUtils::translateColors("&7(&9Connected&7)");
+		} else {
+			return LanguageUtils::translateColors("&7(&4offline&7)");
+		}
 	}
 
 	/**

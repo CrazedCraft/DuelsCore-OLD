@@ -27,7 +27,7 @@ use duels\ui\elements\generic\ServerSelectionButton;
 class ClassicPrisonServerSelectionButton extends ServerSelectionButton {
 
 	public function __construct() {
-		parent::__construct("&l&aClassic Prison", NetworkNode::NODE_CLASSIC_PRISON, ServerSelectionButton::SERVER_ID_INVALID, "257-0.png");
+		parent::__construct("&8Classic Prison", NetworkNode::NODE_CLASSIC_PRISON, ServerSelectionButton::SERVER_ID_INVALID, "257-0.png");
 	}
 
 }

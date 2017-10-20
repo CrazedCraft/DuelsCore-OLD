@@ -27,7 +27,7 @@ use duels\ui\elements\generic\ServerSelectionButton;
 class ClassicPvPServerSelectionButton extends ServerSelectionButton {
 
 	public function __construct() {
-		parent::__construct("&l&6Classic PvP", NetworkNode::NODE_CLASSIC_PVP, ServerSelectionButton::SERVER_ID_INVALID, "315-0.png");
+		parent::__construct("&8Classic PvP", NetworkNode::NODE_CLASSIC_PVP, ServerSelectionButton::SERVER_ID_INVALID, "315-0.png");
 	}
 
 }

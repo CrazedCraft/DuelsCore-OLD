@@ -18,12 +18,13 @@
 
 namespace duels\ui\windows\generic;
 
+use core\language\LanguageUtils;
 use pocketmine\customUI\windows\SimpleForm;
 
 abstract class ServerSelectionForm extends SimpleForm {
 
 	public function __construct(string $title) {
-		parent::__construct($title, "");
+		parent::__construct(LanguageUtils::translateColors($title), "");
 
 		$this->addDefaultButtons();
 	}

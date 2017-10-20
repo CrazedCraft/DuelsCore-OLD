@@ -27,7 +27,7 @@ use duels\ui\elements\generic\ServerSelectionButton;
 class DuelsServerSelectionButton extends ServerSelectionButton {
 
 	public function __construct(int $serverId) {
-		parent::__construct("&l&bDuel {$serverId}", NetworkNode::NODE_DUEL, $serverId, "276-0.png");
+		parent::__construct("&8Duel {$serverId}", NetworkNode::NODE_DUEL, $serverId, "276-0.png");
 	}
 
 }

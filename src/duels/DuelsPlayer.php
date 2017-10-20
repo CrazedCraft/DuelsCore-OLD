@@ -19,10 +19,9 @@
 namespace duels;
 
 use core\CorePlayer;
-use core\gui\item\GUIItem;
+use duels\session\PlayerSession;
 use pocketmine\event\entity\EntityDamageEvent;
-use pocketmine\event\player\PlayerInteractEvent;
-use pocketmine\utils\TextFormat;
+use pocketmine\utils\TextFormat as TF;
 
 class DuelsPlayer extends CorePlayer {
 	//
@@ -51,6 +50,20 @@ class DuelsPlayer extends CorePlayer {
 			Main::getInstance()->listener->onDamage($source);
 		}
 		return $v;
+	}
+
+	public function kill($forReal = false) {
+		$plugin = Main::getInstance();
+		$session = $plugin->getSessionManager()->get($this->getName());
+		if($session instanceof PlayerSession) {
+			if($session->inDuel() and $session->getStatus() === PlayerSession::STATUS_PLAYING and $this->getState() === CorePlayer::STATE_PLAYING) {
+				$session->getDuel()->broadcast(TF::BOLD . TF::AQUA . $this->getName() . TF::RESET . TF::YELLOW . " was killed!");
+				$session->getDuel()->handleDeath($this);
+				return;
+			}
+		}
+
+		parent::kill($forReal);
 	}
 
 }
