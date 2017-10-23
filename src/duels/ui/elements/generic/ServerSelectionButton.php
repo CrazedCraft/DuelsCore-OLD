@@ -20,6 +20,7 @@ namespace duels\ui\elements\generic;
 use core\CorePlayer;
 use core\language\LanguageUtils;
 use core\Main;
+use core\network\NetworkNode;
 use core\network\NetworkServer;
 use pocketmine\customUI\elements\simpleForm\Button;
 
@@ -69,9 +70,9 @@ abstract class ServerSelectionButton extends Button {
 	protected function getOnlineStatus() : string {
 		$networkManager = Main::getInstance()->getNetworkManager();
 		$currentServer = $networkManager->getMap()->getServer();
-		$node = $networkManager->getMap()->getNodes()[$this->node];
-		if($this->serverId !== self::SERVER_ID_INVALID) {
-			$server = $node->getServers()[$this->serverId];
+		$node = $networkManager->getMap()->getNodes()[$this->node] ?? null;
+		if($this->serverId !== self::SERVER_ID_INVALID and $node instanceof NetworkNode) {
+			$server = $node->getServers()[$this->serverId] ?? null;
 		} else {
 			$server = $node->getSuitableServer();
 		}
@@ -84,7 +85,7 @@ abstract class ServerSelectionButton extends Button {
 					return LanguageUtils::translateColors("&7(&4offline&7)");
 				}
 			} else {
-				return LanguageUtils::translateColors("&7(&9Connected&7)");
+				return LanguageUtils::translateColors("&7(&9connected&7)");
 			}
 		} elseif($this->node === $currentServer->getNode() and $this->serverId === $currentServer->getId()) {
 			return LanguageUtils::translateColors("&7(&9Connected&7)");

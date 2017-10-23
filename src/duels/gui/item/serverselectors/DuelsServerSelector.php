@@ -38,7 +38,7 @@ class DuelsServerSelector extends GUIItem {
 
 	public function onClick(CorePlayer $player) {
 		$player->sendMessage(LanguageUtils::translateColors("&6- &aTransferring..."));
-		$server = Main::getInstance()->getNetworkManager()->getNodes()[NodeConstants::NODE_DUEL]->getServers()[$this->nodeId];
+		$server = Main::getInstance()->getNetworkManager()->getNodes()[NodeConstants::NODE_DUEL]->getServers()[$this->nodeId] ?? null;
 		if($server instanceof NetworkServer) {
 			$pk = new TransferPacket();
 			$pk->ip = $server->getHost();
