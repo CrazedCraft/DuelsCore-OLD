@@ -12,6 +12,7 @@ namespace duels\gui\item\kit;
 use core\CorePlayer;
 use core\gui\item\GUIItem;
 use core\language\LanguageUtils;
+use duels\gui\containers\KitSelectionContainer;
 use duels\Main;
 use duels\session\PlayerSession;
 use duels\ui\windows\PlayKitSelectionForm;
@@ -38,9 +39,9 @@ class KitSelector extends GUIItem {
 		}
 		if(!$session->inParty()) {
 			if($player->getPlayerProtocol() >= Info::PROTOCOL_120) {
-				$player->showModal($plugin->getUIManager()->getForm(PlayKitSelectionForm::FORM_UI_ID));
+				$player->showModal($player->getCore()->getUIManager()->getForm(PlayKitSelectionForm::FORM_UI_ID));
 			} else {
-				$player->addWindow($player->getGuiContainer(Main::GUI_KIT_SELECTION_CONTAINER));
+				$player->openGuiContainer($player->getCore()->getGuiManager()->getContainer(KitSelectionContainer::CONTAINER_ID));
 			}
 		} else {
 			$player->sendMessage(TF::RED . "You must use the party event item or the NPC's to play duels while in a party!");

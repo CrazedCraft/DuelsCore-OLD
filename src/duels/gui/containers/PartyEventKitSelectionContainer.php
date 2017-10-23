@@ -35,12 +35,15 @@ use pocketmine\utils\TextFormat as TF;
 
 class PartyEventKitSelectionContainer extends ChestGUI {
 
+	const CONTAINER_ID = "party_kit_selection_container";
+
 	/** @var GUIItem[] */
 	protected $defaultContents = [];
 
-	public function __construct(CorePlayer $owner) {
-		parent::__construct($owner);
-		foreach(Main::getInstance()->getKitManager()->getSelectionItems() as $item) {
+	public function __construct(Main $plugin) {
+		parent::__construct($plugin->getCore());
+
+		foreach($plugin->getKitManager()->getSelectionItems() as $item) {
 			$this->defaultContents[] = new KitGUIItem($item);
 		}
 		$this->setContents($this->defaultContents);
@@ -49,13 +52,6 @@ class PartyEventKitSelectionContainer extends ChestGUI {
 	public function onOpen(Player $who) {
 		$this->setContents($this->defaultContents);
 		parent::onOpen($who);
-	}
-
-	public function close(Player $who) {
-		$pk = new ContainerClosePacket();
-		$pk->windowid = $who->getWindowId($this);
-		$who->directDataPacket($pk);
-		BaseInventory::onClose($who);
 	}
 
 	public function onSelect($slot, GUIItem $item, CorePlayer $player) {
@@ -87,7 +83,7 @@ class PartyEventKitSelectionContainer extends ChestGUI {
 					return false;
 				}
 				$plugin->arenaManager->remove($arena->getId());
-				$duel = new Duel($plugin, $session->lastSelectedPartyType, $arena, $item->getKit() instanceof RandomKit ? $plugin->getKitManager()->findRandom() : $item->getKit(), false);
+				$duel = new Duel($plugin, $session->lastSelectedPartyType, $arena, $item->getKit() instanceof RandomKit ? $plugin->getKitManager()->findRandom() : $item->getKit());
 				$session->lastSelectedPartyType = "";
 				foreach($players as $p) {
 					if($duel->isJoinable() or $duel->getType() === Duel::TYPE_FFA) {

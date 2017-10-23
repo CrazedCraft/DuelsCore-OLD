@@ -84,7 +84,6 @@ class EventListener implements Listener {
 		}
 		$this->plugin->getSessionManager()->add($player);
 		$player->setNameTag(TF::YELLOW . $player->getName());
-		$this->plugin->addGuiConatiners($player);
 		$this->plugin->giveLobbyItems($player);
 		//$this->plugin->lobbyBossBar->spawnTo($player);
 	}

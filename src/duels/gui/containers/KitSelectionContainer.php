@@ -17,19 +17,20 @@ use duels\gui\item\kit\KitGUIItem;
 use duels\kit\RandomKit;
 use duels\Main;
 use duels\session\PlayerSession;
-use pocketmine\inventory\BaseInventory;
-use pocketmine\network\protocol\ContainerClosePacket;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat as TF;
 
 class KitSelectionContainer extends ChestGUI {
 
+	const CONTAINER_ID = "kit_selection_container";
+
 	/** @var GUIItem[] */
 	protected $defaultContents = [];
 
-	public function __construct(CorePlayer $owner) {
-		parent::__construct($owner);
-		foreach(Main::getInstance()->getKitManager()->getSelectionItems() as $item) {
+	public function __construct(Main $plugin) {
+		parent::__construct($plugin->getCore());
+
+		foreach($plugin->getKitManager()->getSelectionItems() as $item) {
 			$this->defaultContents[] = new KitGUIItem($item, $this);
 		}
 		$this->setContents($this->defaultContents);
@@ -38,13 +39,6 @@ class KitSelectionContainer extends ChestGUI {
 	public function onOpen(Player $who) {
 		$this->setContents($this->defaultContents);
 		parent::onOpen($who);
-	}
-
-	public function close(Player $who) {
-		$pk = new ContainerClosePacket();
-		$pk->windowid = $who->getWindowId($this);
-		$who->directDataPacket($pk);
-		BaseInventory::onClose($who);
 	}
 
 	public function onSelect($slot, GUIItem $item, CorePlayer $player) {

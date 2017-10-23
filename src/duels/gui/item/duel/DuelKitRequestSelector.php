@@ -11,6 +11,7 @@ namespace duels\gui\item\duel;
 use core\CorePlayer;
 use core\gui\item\GUIItem;
 use core\language\LanguageUtils;
+use duels\gui\containers\DuelKitSelectionContainer;
 use duels\Main;
 use duels\ui\windows\DuelRequestKitSelectionForm;
 use pocketmine\item\Item;
@@ -28,11 +29,10 @@ class DuelKitRequestSelector extends GUIItem {
 	}
 
 	public function onClick(CorePlayer $player) {
-		$plugin = Main::getInstance();
 		if($player->getPlayerProtocol() >= Info::PROTOCOL_120) {
-			$player->showModal($plugin->getUIManager()->getForm(DuelRequestKitSelectionForm::FORM_UI_ID));
+			$player->showModal($player->getCore()->getUIManager()->getForm(DuelRequestKitSelectionForm::FORM_UI_ID));
 		} else {
-			$player->addWindow($player->getGuiContainer(Main::GUI_DUEL_SELECTION_CONTAINER));
+			$player->openGuiContainer($player->getCore()->getGuiManager()->getContainer(DuelKitSelectionContainer::CONTAINER_ID));
 		}
 	}
 

@@ -2,9 +2,10 @@
 
 namespace duels;
 
-use core\CorePlayer;
 use core\entity\BossBar;
 use core\entity\text\UpdatableFloatingText;
+use core\gui\item\defaults\serverselector\ServerSelector;
+use core\util\traits\CorePluginReference;
 use duels\gui\containers\PartyEventKitSelectionContainer;
 use duels\gui\containers\PartyEventSelectionContainer;
 use duels\gui\item\party\PartyEventSelector;
@@ -18,10 +19,8 @@ use duels\duel\Duel;
 use duels\duel\DuelManager;
 use duels\gui\containers\DuelKitSelectionContainer;
 use duels\gui\containers\KitSelectionContainer;
-use duels\gui\containers\ServerSelectionContainer;
 use duels\gui\item\duel\DuelKitRequestSelector;
 use duels\gui\item\kit\KitSelector;
-use duels\gui\item\serverselectors\ServerSelector;
 use duels\kit\KitManager;
 use duels\npc\NPCManager;
 use duels\party\PartyManager;
@@ -29,20 +28,21 @@ use duels\rank\RankManager;
 use duels\session\SessionManager;
 use duels\tasks\SessionCleanupTask;
 use duels\tasks\UpdateInfoTextTask;
-use duels\ui\UIManager;
-use pocketmine\block\SignPost;
+use duels\ui\elements\DuelRequestKitSelectionButton;
+use duels\ui\elements\PlayKitSelectionButton;
+use duels\ui\windows\DuelRequestKitSelectionForm;
+use duels\ui\windows\PlayKitSelectionForm;
 use pocketmine\item\Item;
 use pocketmine\level\Position;
 use pocketmine\math\Vector3;
 use pocketmine\Player;
 use pocketmine\plugin\PluginBase;
-use pocketmine\utils\TextFormat as TF;
+use pocketmine\utils\PluginException;
 
 class Main extends PluginBase {
 
-	const GUI_DUEL_SELECTION_CONTAINER = "duel_selection_container";
-	const GUI_KIT_SELECTION_CONTAINER = "kit_selection_container";
-	const GUI_SERVER_SELECTION_CONTAINER = "server_selection_container";
+	use CorePluginReference;
+
 	const GUI_PARTY_TYPE_SELECTION_CONTAINER = "party_type_selection_container";
 	const GUI_PARTY_KIT_SELECTION_CONTAINER = "party_kit_selection_container";
 
@@ -75,9 +75,6 @@ class Main extends PluginBase {
 
 	/** @var PartyManager */
 	public $partyManager;
-
-	/** @var UIManager */
-	public $UIManager;
 
 	/** @var array */
 	public $needAuth = [];
@@ -113,16 +110,20 @@ class Main extends PluginBase {
 
 	public function onEnable() {
 		self::$instance = $this;
+
+		$components = $this->getServer()->getPluginManager()->getPlugin("Components");
+		if(!$components instanceof \core\Main) {
+			throw new PluginException("Components plugin isn't loaded!");
+		}
+
+		$this->setCore($components);
+
 		//$this->lobbyBossBar = new BossBar();
 		//$this->lobbyBossBar->setText(LanguageUtils::translateColors("&l&eWelcome to &1C&ar&ea&6z&9e&5d&fC&7r&6a&cf&dt &6Duels&r"));
 		$this->getServer()->setAutoSave(false);
-		$level = $this->getServer()->getDefaultLevel();
-		$level->setTime(6000);
-		$level->stopTime();
-		$level->setAutoSave(false);
+		$this->getServer()->getDefaultLevel()->setAutoSave(false);
 		Main::$spawnCoords = new Vector3(0.5, 93, 0.5);
 		$this->setLobbyItems();
-		$this->getServer()->getPluginManager()->registerEvents($this->listener = new EventListener($this), $this);
 		$this->loadConfigs();
 		$this->setSessionManager();
 		$this->setArenaManager();
@@ -130,7 +131,9 @@ class Main extends PluginBase {
 		$this->setDuelManager();
 		$this->setKitManager();
 		$this->setPartyManager();
-		$this->setUIManager();
+		$this->registerGuiContainers();
+		$this->registerUiWindows();
+		$this->getServer()->getPluginManager()->registerEvents($this->listener = new EventListener($this), $this);
 		$this->getServer()->getNetwork()->setName(LanguageUtils::translateColors("&1C&ar&ea&6z&9e&5d&fC&7r&6a&cf&dt &l&6Duels&r"));
 		$this->getServer()->getNetwork()->updateName();
 		$this->getCommand("duel")->setExecutor(new DuelCommand($this));
@@ -245,14 +248,6 @@ class Main extends PluginBase {
 		$this->partyManager = new PartyManager($this);
 	}
 
-	public function getUIManager() : UIManager {
-		return $this->UIManager;
-	}
-
-	public function setUIManager() {
-		$this->UIManager = new UIManager($this);
-	}
-
 	public function getPlayingCount($type) {
 		$count = 0;
 		/** @var Duel $duel */
@@ -311,11 +306,24 @@ class Main extends PluginBase {
 		$inv->sendContents($player);
 	}
 
-	public function addGuiConatiners(CorePlayer $player) {
-		$player->addGuiContainer(new DuelKitSelectionContainer($player), Main::GUI_DUEL_SELECTION_CONTAINER, true);
-		$player->addGuiContainer(new KitSelectionContainer($player), Main::GUI_KIT_SELECTION_CONTAINER, true);
-		$player->addGuiContainer(new ServerSelectionContainer($player), Main::GUI_SERVER_SELECTION_CONTAINER, true);
-		$player->addGuiContainer(new PartyEventSelectionContainer($player), Main::GUI_PARTY_TYPE_SELECTION_CONTAINER, true);
-		$player->addGuiContainer(new PartyEventKitSelectionContainer($player), Main::GUI_PARTY_KIT_SELECTION_CONTAINER, true);
+	/**
+	 * Register the custom GUI containers
+	 */
+	protected function registerGuiContainers() {
+		$guiManager = $this->getCore()->getGuiManager();
+		$guiManager->registerContainer(new DuelKitSelectionContainer($this), DuelKitSelectionContainer::CONTAINER_ID, true);
+		$guiManager->registerContainer(new KitSelectionContainer($this), KitSelectionContainer::CONTAINER_ID, true);
+		$guiManager->registerContainer(new PartyEventSelectionContainer($this), PartyEventSelectionContainer::CONTAINER_ID, true);
+		$guiManager->registerContainer(new PartyEventKitSelectionContainer($this), PartyEventKitSelectionContainer::CONTAINER_ID, true);
 	}
+
+	/**
+	 * Register the custom UI windows
+	 */
+	protected function registerUiWindows() {
+		$uiManager = $this->getCore()->getUiManager();
+		$uiManager->registerForm(new PlayKitSelectionForm(LanguageUtils::translateColors("&l&eSelect a kit to play"), PlayKitSelectionButton::class), PlayKitSelectionForm::FORM_UI_ID);
+		$uiManager->registerForm(new DuelRequestKitSelectionForm(LanguageUtils::translateColors("&l&eSelect a kit"), DuelRequestKitSelectionButton::class), DuelRequestKitSelectionForm::FORM_UI_ID);
+	}
+
 }

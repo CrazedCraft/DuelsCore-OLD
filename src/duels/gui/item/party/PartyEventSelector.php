@@ -24,6 +24,7 @@ use core\language\LanguageUtils;
 use core\Utils;
 use duels\arena\Arena;
 use duels\duel\Duel;
+use duels\gui\containers\PartyEventSelectionContainer;
 use duels\Main;
 use duels\session\PlayerSession;
 use pocketmine\item\Item;
@@ -50,7 +51,7 @@ class PartyEventSelector extends GUIItem {
 		if(!$session->inDuel()) {
 			if($session->inParty()) {
 				if($session->getParty()->isOwner($player)) {
-					$player->addWindow($player->getGuiContainer(Main::GUI_PARTY_TYPE_SELECTION_CONTAINER));
+					$player->openGuiContainer($player->getCore()->getGuiManager()->getContainer(PartyEventSelectionContainer::CONTAINER_ID));
 				} else {
 					$player->sendMessage(Utils::translateColors("&cYou must be the party leader to start an event!"));
 					return;

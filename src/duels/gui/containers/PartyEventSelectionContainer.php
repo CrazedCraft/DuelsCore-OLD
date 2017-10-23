@@ -36,11 +36,14 @@ use pocketmine\utils\TextFormat as TF;
 
 class PartyEventSelectionContainer extends ChestGUI {
 
+	const CONTAINER_ID = "party_type_selection_container";
+
 	/** @var GUIItem[] */
 	protected $defaultContents = [];
 
-	public function __construct(CorePlayer $owner) {
-		parent::__construct($owner);
+	public function __construct(Main $plugin) {
+		parent::__construct($plugin->getCore());
+
 		$this->defaultContents[] = new PartyTypeSelectionItem(Item::get(Item::MOB_HEAD, Skull::TYPE_HUMAN, 1), Duel::TYPE_1V1, $this, "&l&b1v1");
 		$this->defaultContents[] = new PartyTypeSelectionItem(Item::get(Item::MOB_HEAD, Skull::TYPE_HUMAN, 2), Duel::TYPE_2V2, $this, "&l&b2v2");
 		$this->defaultContents[] = Item::get(Item::AIR);
@@ -51,13 +54,6 @@ class PartyEventSelectionContainer extends ChestGUI {
 	public function onOpen(Player $who) {
 		$this->setContents($this->defaultContents);
 		parent::onOpen($who);
-	}
-
-	public function close(Player $who) {
-		$pk = new ContainerClosePacket();
-		$pk->windowid = $who->getWindowId($this);
-		$who->directDataPacket($pk);
-		BaseInventory::onClose($who);
 	}
 
 	public function onSelect($slot, GUIItem $item, CorePlayer $player) {
@@ -78,7 +74,7 @@ class PartyEventSelectionContainer extends ChestGUI {
 					if(count($session->getParty()->getPlayers()) <= 2) {
 						$player->sendMessage(Utils::translateColors("&aStarting party 1v1 event..."));
 						$session->lastSelectedPartyType = $item->getDuelType();
-						$player->addWindow($player->getGuiContainer(Main::GUI_PARTY_KIT_SELECTION_CONTAINER));
+						$player->openGuiContainer($player->getCore()->getGuiManager()->getContainer(PartyEventKitSelectionContainer::CONTAINER_ID));
 					} else {
 						$player->sendMessage(Utils::translateColors("&cThere can't be more than two players in the party to start a 1v1 event!"));
 					}
@@ -87,7 +83,7 @@ class PartyEventSelectionContainer extends ChestGUI {
 					if(count($session->getParty()->getPlayers()) <= 4) {
 						$player->sendMessage(Utils::translateColors("&aStarting party 2v2 event..."));
 						$session->lastSelectedPartyType = $item->getDuelType();
-						$player->addWindow($player->getGuiContainer(Main::GUI_PARTY_KIT_SELECTION_CONTAINER));
+						$player->openGuiContainer($player->getCore()->getGuiManager()->getContainer(PartyEventKitSelectionContainer::CONTAINER_ID));
 					} else {
 						$player->sendMessage(Utils::translateColors("&cThere can't be more than four players in the party to start a 2v2 event!"));
 					}
@@ -95,7 +91,7 @@ class PartyEventSelectionContainer extends ChestGUI {
 				case Duel::TYPE_FFA:
 					$player->sendMessage(Utils::translateColors("&aStarting party FFA event..."));
 					$session->lastSelectedPartyType = $item->getDuelType();
-					$player->addWindow($player->getGuiContainer(Main::GUI_PARTY_KIT_SELECTION_CONTAINER));
+					$player->openGuiContainer($player->getCore()->getGuiManager()->getContainer(PartyEventKitSelectionContainer::CONTAINER_ID));
 					return false;
 				default:
 					$player->sendMessage(Utils::translateColors("&cCould not start party event!"));

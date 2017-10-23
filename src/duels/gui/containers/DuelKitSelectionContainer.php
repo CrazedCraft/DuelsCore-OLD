@@ -17,6 +17,8 @@ use pocketmine\utils\TextFormat as TF;
 
 class DuelKitSelectionContainer extends KitSelectionContainer {
 
+	const CONTAINER_ID = "duel_selection_container";
+
 	public function onSelect($slot, GUIItem $item, CorePlayer $player) {
 		$player->removeWindow($this);
 		if(!$item instanceof KitGUIItem) {
