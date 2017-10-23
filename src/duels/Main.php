@@ -5,6 +5,7 @@ namespace duels;
 use core\entity\BossBar;
 use core\entity\text\UpdatableFloatingText;
 use core\gui\item\defaults\serverselector\ServerSelector;
+use core\gui\item\defaults\SpawnWarpItem;
 use core\util\traits\CorePluginReference;
 use duels\gui\containers\PartyEventKitSelectionContainer;
 use duels\gui\containers\PartyEventSelectionContainer;
@@ -272,7 +273,7 @@ class Main extends PluginBase {
 			new DuelKitRequestSelector(),
 			Item::get(Item::AIR),
 			Item::get(Item::AIR),
-			Item::get(Item::AIR),
+			new SpawnWarpItem(),
 			Item::get(Item::AIR),
 			new ServerSelector(),
 		];
