@@ -1,0 +1,133 @@
+[
+	{
+		"name": "&l&bRandom",
+		"image": "http://jacknoordhuis.net/minecraft/icons/items/279-0.png",
+		"item": {
+			"id": 279
+		},
+		"type": "random"
+	},
+	{
+		"name": "&l&aUHC",
+		"image": "http://jacknoordhuis.net/minecraft/icons/items/322-0.png",
+		"item": {
+			"id": 322
+		},
+		"type": "kit",
+		"items": {
+			"0": {
+				"id": 276,
+				"enchantments": [[9, 5]]
+			},
+			"1": {
+				"id": 322,
+				"count": 16
+			},
+			"2": {
+				"id": 261,
+				"enchantments": [[19, 4]]
+			},
+			"3": {
+				"id": 322,
+				"count": 3
+			},
+			"5": {
+				"id": 364,
+				"count": 64
+			},
+			"7": {
+				"id": 262,
+				"count": 64
+			}
+		},
+		"armor": [
+			{
+				"id": 310,
+				"enchantments": [[4, 2]]
+			},
+			{
+				"id": 307
+			},
+			{
+				"id": 308,
+				"enchantments": [[4]]
+			},
+			{
+				"id": 313,
+				"enchantments": [[3, 2]]
+			}
+		]
+	},
+	{
+		"name": "&l&aArcher",
+		"image": "http://jacknoordhuis.net/minecraft/icons/items/261-0.png",
+		"item": {
+			"id": 261
+		},
+		"type": "kit",
+		"items": {
+			"0": {
+				"id": 261,
+				"enchantments": [[20, 2], [22]]
+			},
+			"1": {
+				"id": 262,
+				"count": 1
+			},
+			"5": {
+				"id": 364,
+				"count": 64
+			}
+		},
+		"armor": [
+			{
+				"id": 298
+			},
+			{
+				"id": 299
+			},
+			{
+				"id": 300
+			},
+			{
+				"id": 301
+			}
+		]
+	},
+	{
+		"name": "&l&aCombo",
+		"image": "http://jacknoordhuis.net/minecraft/icons/items/349-3.png",
+		"item": {
+			"id": 462
+		},
+		"type": "kit",
+		"items": {
+			"0": {
+				"id": 261,
+				"enchantments": [[20, 2], [22]]
+			},
+			"1": {
+				"id": 262,
+				"count": 1
+			},
+			"5": {
+				"id": 364,
+				"count": 64
+			}
+		},
+		"armor": [
+			{
+				"id": 298
+			},
+			{
+				"id": 299
+			},
+			{
+				"id": 300
+			},
+			{
+				"id": 301
+			}
+		]
+	}
+]
