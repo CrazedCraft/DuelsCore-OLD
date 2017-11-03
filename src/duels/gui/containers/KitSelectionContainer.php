@@ -41,7 +41,7 @@ class KitSelectionContainer extends ChestGUI {
 		parent::onOpen($who);
 	}
 
-	public function onSelect($slot, GUIItem $item, CorePlayer $player) {
+	public function onSelect(int $slot, GUIItem $item, CorePlayer $player) : bool {
 		$player->removeWindow($this);
 		if(!$item instanceof KitGUIItem) {
 			throw new \InvalidArgumentException("Expected duels/gui/item/kit/KitGUIItem, got core/gui/item/GUIItem instead");

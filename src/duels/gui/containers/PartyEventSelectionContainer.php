@@ -23,14 +23,11 @@ use core\gui\container\ChestGUI;
 use core\gui\item\GUIItem;
 use core\Utils;
 use duels\duel\Duel;
-use duels\gui\item\kit\KitGUIItem;
 use duels\gui\item\party\PartyTypeSelectionItem;
 use duels\Main;
 use duels\session\PlayerSession;
-use pocketmine\inventory\BaseInventory;
 use pocketmine\item\Item;
 use pocketmine\item\Skull;
-use pocketmine\network\protocol\ContainerClosePacket;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat as TF;
 
@@ -56,8 +53,8 @@ class PartyEventSelectionContainer extends ChestGUI {
 		parent::onOpen($who);
 	}
 
-	public function onSelect($slot, GUIItem $item, CorePlayer $player) {
-		$player->removeWindow($this);
+	public function onSelect(int $slot, GUIItem $item, CorePlayer $player) : bool {
+		//$player->removeWindow($this);
 		if(!$item instanceof PartyTypeSelectionItem) {
 			throw new \InvalidArgumentException("Expected duels/gui/item/party/PartyTypeSelectionItem, got " . gettype($item) . " instead");
 		}
@@ -78,7 +75,7 @@ class PartyEventSelectionContainer extends ChestGUI {
 					} else {
 						$player->sendMessage(Utils::translateColors("&cThere can't be more than two players in the party to start a 1v1 event!"));
 					}
-					return false;
+					break;
 				case Duel::TYPE_2V2:
 					if(count($session->getParty()->getPlayers()) <= 4) {
 						$player->sendMessage(Utils::translateColors("&aStarting party 2v2 event..."));
@@ -87,19 +84,17 @@ class PartyEventSelectionContainer extends ChestGUI {
 					} else {
 						$player->sendMessage(Utils::translateColors("&cThere can't be more than four players in the party to start a 2v2 event!"));
 					}
-					return false;
+					break;
 				case Duel::TYPE_FFA:
 					$player->sendMessage(Utils::translateColors("&aStarting party FFA event..."));
 					$session->lastSelectedPartyType = $item->getDuelType();
 					$player->openGuiContainer($player->getCore()->getGuiManager()->getContainer(PartyEventKitSelectionContainer::CONTAINER_ID));
-					return false;
+					break;
 				default:
 					$player->sendMessage(Utils::translateColors("&cCould not start party event!"));
-					return false;
 			}
 		} else {
 			$player->sendMessage(Utils::translateColors("&cYou must be in a party to start an event!"));
-			return false;
 		}
 
 		return false; // don't remove the item
