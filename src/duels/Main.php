@@ -296,13 +296,8 @@ class Main extends PluginBase {
 	 * @param bool $shouldCloneItems
 	 */
 	public static function giveItems(Player $player, array $items, $shouldCloneItems = false) {
-		for($i = 0, $hotbarIndex = 0, $invIndex = 0, $inv = $player->getInventory(), $itemCount = count($items); $i < $itemCount; $i++, $invIndex++) {
+		for($i = 0, $invIndex = 0, $inv = $player->getInventory(), $itemCount = count($items); $i < $itemCount; $i++, $invIndex++) {
 			$inv->setItem($invIndex, ($shouldCloneItems ? clone $items[$i] : $items[$i]));
-			if($hotbarIndex <= 9) {
-				$inv->setHotbarSlotIndex($hotbarIndex, $invIndex);
-				$hotbarIndex++;
-			}
-			continue;
 		}
 		$inv->sendContents($player);
 	}

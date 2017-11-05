@@ -284,12 +284,8 @@ class KitManager {
 		if(!$player->isOnline() or !$player->getInventory() instanceof PlayerInventory) return;
 		if($kit instanceof RandomKit) $this->apply($player, $this->findRandom());
 		$items = $kit->getItems();
-		for($i = 0, $hotbarIndex = 0, $invIndex = 0, $inv = $player->getInventory(), $itemCount = count($kit->getItems()); $i < $itemCount; $i++, $invIndex++) {
+		for($i = 0, $invIndex = 0, $inv = $player->getInventory(), $itemCount = count($kit->getItems()); $i < $itemCount; $i++, $invIndex++) {
 			$inv->setItem($invIndex, $items[$i]);
-			if($hotbarIndex <= 9) {
-				$inv->setHotBarSlotIndex($hotbarIndex, $invIndex);
-				$hotbarIndex++;
-			}
 			continue;
 		}
 		$player->getInventory()->sendContents($player);

@@ -91,7 +91,7 @@ class Duel {
 				//$this->bossBar->despawnFrom($p);
 				$p->setStatus("state.lobby");
 				$p->removeAllEffects();
-				$p->fireTicks = 0;
+				$p->extinguish();
 				$p->setHealth(20);
 				$p->setFood(20);
 				$p->teleport(Main::$spawnCoords);
@@ -320,7 +320,7 @@ class Duel {
 		$victim->setFood(20);
 		$victim->getInventory()->sendContents($victim);
 		$victim->getInventory()->sendArmorContents($victim);
-		$victim->fireTicks = 0;
+		$victim->extinguish();
 		$victim->teleport(Main::$spawnCoords);
 		if($victim->getInventory() instanceof PlayerInventory) $victim->getInventory()->clearAll();
 		$session = $this->plugin->sessionManager->get($victim->getName());
