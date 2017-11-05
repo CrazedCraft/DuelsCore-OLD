@@ -32,9 +32,6 @@ use pocketmine\utils\TextFormat as TF;
 
 class EventListener implements Listener {
 
-	public $needAuth = [];
-	public $attempts = [];
-	public $lastMsg = [];
 	private $plugin;
 
 	/** @var Item */
@@ -52,10 +49,6 @@ class EventListener implements Listener {
 	 */
 	public function onCreation(PlayerCreationEvent $event) {
 		$event->setPlayerClass(DuelsPlayer::class);
-	}
-
-	public function onQuery(QueryRegenerateEvent $event) {
-		$event->setServerName(Main::translateColors("&1C&ar&ea&6z&9e&5d&fC&7r&6a&cf&dt &l&6Duels&r"));
 	}
 
 	public function onExhaust(PlayerExhaustEvent $event) {

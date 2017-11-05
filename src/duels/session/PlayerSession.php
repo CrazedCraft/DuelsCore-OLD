@@ -25,17 +25,11 @@ class PlayerSession {
 	/** @var null|Kit */
 	public $lastSelectedKit = null;
 
-	/** @var string */
-	public $ranks = "";
-
 	/** @var bool */
 	public $requestsStatus = true;
 
 	/** @var array */
 	public $requests = [];
-
-	/** @var bool */
-	public $authed = false;
 
 	/** @var Player */
 	private $player;
@@ -61,12 +55,10 @@ class PlayerSession {
 	/** @var bool */
 	protected $active = true;
 
-	public function __construct(Player $player, $authed = false, $status = self::STATUS_WAITING, $duel = null) {
+	public function __construct(Player $player, $status = self::STATUS_WAITING, $duel = null) {
 		$this->player = $player;
 		$this->status = $status;
 		$this->duel = $duel;
-		$this->authed = $authed;
-		$this->recalculateName();
 	}
 
 	public function isActive() {
@@ -121,14 +113,6 @@ class PlayerSession {
 		unset($this->team);
 	}
 
-	public function isAuthed() {
-		return $this->isAuthed();
-	}
-
-	public function setAuthed($value) {
-		$this->authed = $value;
-	}
-
 	public function addRequest(Player $requester, Player $player, $kitName = "") {
 		$this->requests[$requester->getName()] = new RequestTask(Main::getInstance(), $player, $requester);
 		$player->sendMessage(TF::AQUA . "Duel request from " . TF::BOLD . TF::GOLD . $requester->getName() . TF::RESET . TF::AQUA . ($kitName !== "" ? " with the {$kitName}" . TF::RESET . TF::AQUA : "") . " type " . TF::GOLD . "/duel " . $requester->getName() . TF::AQUA . " to accept!");
@@ -163,7 +147,6 @@ class PlayerSession {
 			unset($this->player);
 			unset($this->status);
 			unset($this->duel);
-			unset($this->ranks);
 		}
 	}
 

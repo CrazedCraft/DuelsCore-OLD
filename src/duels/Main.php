@@ -15,7 +15,6 @@ use duels\arena\ArenaManager;
 use duels\command\DuelCommand;
 use duels\command\HubCommand;
 use duels\command\PartyCommand;
-use duels\database\AuthDatabase;
 use duels\duel\Duel;
 use duels\duel\DuelManager;
 use duels\gui\containers\DuelKitSelectionContainer;
@@ -25,7 +24,6 @@ use duels\gui\item\kit\KitSelector;
 use duels\kit\KitManager;
 use duels\npc\NPCManager;
 use duels\party\PartyManager;
-use duels\rank\RankManager;
 use duels\session\SessionManager;
 use duels\tasks\SessionCleanupTask;
 use duels\tasks\UpdateInfoTextTask;
@@ -38,6 +36,7 @@ use pocketmine\level\Position;
 use pocketmine\math\Vector3;
 use pocketmine\Player;
 use pocketmine\plugin\PluginBase;
+use pocketmine\utils\Config;
 use pocketmine\utils\PluginException;
 
 class Main extends PluginBase {
@@ -52,9 +51,6 @@ class Main extends PluginBase {
 
 	/** @var EventListener */
 	public $listener;
-
-	/** @var AuthDatabase */
-	public $authDatabase;
 
 	/** @var SessionManager */
 	public $sessionManager;
@@ -71,14 +67,8 @@ class Main extends PluginBase {
 	/** @var KitManager */
 	public $kitManager;
 
-	/** @var RankManager */
-	public $rankManager;
-
 	/** @var PartyManager */
 	public $partyManager;
-
-	/** @var array */
-	public $needAuth = [];
 
 	/** @var SessionCleanupTask */
 	protected $sessionCleanup;
@@ -95,6 +85,13 @@ class Main extends PluginBase {
 	/** @var BossBar */
 	public $lobbyBossBar = null;
 
+	/** @var array */
+	public static $languages = [
+		"en" => "english.json"
+	];
+
+	const MESSAGES_FILE_PATH = "messages" . DIRECTORY_SEPARATOR;
+
 	public static function getInstance() {
 		return self::$instance;
 	}
@@ -103,10 +100,6 @@ class Main extends PluginBase {
 		$m = floor($seconds / 60);
 		$s = floor($seconds % 60);
 		return (($m < 10 ? "0" : "") . $m . ":" . ($s < 10 ? "0" : "") . (string)$s);
-	}
-
-	public static function hash($salt, $password) {
-		return bin2hex(hash("sha512", $password . $salt, true) ^ hash("whirlpool", $salt . $password, true));
 	}
 
 	public function onEnable() {
@@ -145,7 +138,20 @@ class Main extends PluginBase {
 	}
 
 	public function loadConfigs() {
+		if(!is_dir($this->getDataFolder())) @mkdir($this->getDataFolder());
 		$this->saveResource("skins" . DIRECTORY_SEPARATOR . "default.skin");
+
+		$msgPath = $this->getDataFolder() . self::MESSAGES_FILE_PATH;
+		if(!is_dir($msgPath)) @mkdir($msgPath);
+		foreach(self::$languages as $lang => $filename) {
+			$file = $msgPath . $filename;
+			$this->saveResource(self::MESSAGES_FILE_PATH . $filename);
+			if(!is_file($file)) {
+				$this->getLogger()->warning("Couldn't find language file for '{$lang}'! Path: {$file}");
+			} else {
+				$this->getCore()->getLanguageManager()->registerLanguage($lang, (new Config($file, Config::JSON))->getAll());
+			}
+		}
 	}
 
 	public function spawnInfoText() {
@@ -171,21 +177,10 @@ class Main extends PluginBase {
 	}
 
 	public function onDisable() {
-		//foreach($this->getServer()->getOnlinePlayers() as $p) {
-		//	$p->kick(LanguageUtils::translateColors("&l&1C&ar&ea&6z&9e&5d&fC&7r&6a&cf&dt &6Duels&r &bwill be back in a moment!&r"), false);
-		//}
 		$this->duelManager->close();
 		$this->partyManager->close();
 		$this->sessionManager->close();
 		unset($this->sessionManager, $this->arenaManager, $this->npcManager, $this->duelManager);
-	}
-
-	public function getAuthDatabase() {
-		return;
-	}
-
-	public function setAuthDatabase() {
-		return;
 	}
 
 	public function getSessionManager() {
@@ -226,15 +221,6 @@ class Main extends PluginBase {
 	public function setKitManager() {
 		if(isset($this->kitManager) and $this->kitManager instanceof KitManager) return;
 		$this->kitManager = new KitManager($this);
-	}
-
-	public function getRankManager() {
-		return $this->rankManager;
-	}
-
-	public function setRankManager() {
-		if(isset($this->rankManager) and $this->rankManager instanceof RankManager) return;
-		$this->rankManager = new RankManager($this);
 	}
 
 	/**

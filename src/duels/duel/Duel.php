@@ -103,7 +103,7 @@ class Duel {
 					$p->getInventory()->sendArmorContents($p);
 				}
 				$session = $this->plugin->sessionManager->get($p->getName());
-				$p->setNameTag((isset($session->ranks) ? $session->ranks : "") . TF::YELLOW . TF::clean($p->getName()));
+				$p->setNameTag(TF::YELLOW . TF::clean($p->getName()));
 				if($session instanceof PlayerSession) $session->removeDuel();
 				if($p instanceof Player and $p->isOnline()) $this->plugin->giveLobbyItems($p);
 			}

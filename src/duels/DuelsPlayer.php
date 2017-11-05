@@ -19,12 +19,9 @@
 namespace duels;
 
 use core\CorePlayer;
-use core\language\LanguageUtils;
 use duels\session\PlayerSession;
 use pocketmine\event\entity\EntityDamageEvent;
-use pocketmine\network\protocol\LevelEventPacket;
 use pocketmine\utils\TextFormat as TF;
-use pocketmine\utils\TextFormat;
 
 class DuelsPlayer extends CorePlayer {
 	//
@@ -67,18 +64,6 @@ class DuelsPlayer extends CorePlayer {
 		}
 
 		parent::kill($forReal);
-	}
-
-	public function afterAuthCheck() {
-		$this->addTitle(LanguageUtils::translateColors("&eWelcome to &1C&ar&ea&6z&9e&5d&fC&7r&6a&cf&dt &l&6Duels&r&e!"), TextFormat::GRAY . ($this->isAuthenticated() ? "Use the sword to start playing!" : ($this->isRegistered() ? "Login to start playing!" : "Follow the prompts to register!")), 10, 100, 10);
-
-		$pk = new LevelEventPacket();
-		$pk->x = $this->x;
-		$pk->y = $this->y;
-		$pk->z = $this->z;
-		$pk->evid = LevelEventPacket::EVENT_SOUND_CLICK_FAIL;
-		$pk->data = 0;
-		$this->dataPacket($pk);
 	}
 
 }
