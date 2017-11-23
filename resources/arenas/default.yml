@@ -1,0 +1,10 @@
+# CrazedCraft Network - Arena Configeration file
+---
+arena:
+        name: "default"
+        type: "1v1"
+        creator: "Jack"
+        locations:
+                1: 120 10 120
+                2: 130 10 130
+...

@@ -1,89 +1,54 @@
 <?php
 
-namespace duels\command;
+/**
+ * DuelCommand.php class
+ *
+ * Created on 31/03/2016 at 10:10 PM
+ *
+ * @author Jack
+ */
 
-use duels\arena\Arena;
-use duels\duel\Duel;
-use duels\kit\Kit;
-use duels\kit\RandomKit;
+
+namespace duels\command\commands;
+
+use core\command\CoreUserCommand;
+use core\language\LanguageManager;
+use duels\DuelsPlayer;
+
 use duels\Main;
-use duels\session\PlayerSession;
-use pocketmine\command\Command;
-use pocketmine\command\CommandExecutor;
-use pocketmine\command\CommandSender;
-use pocketmine\Player;
-use pocketmine\utils\TextFormat as TF;
 
-class DuelCommand implements CommandExecutor {
-
-	private $plugin;
+class DuelCommand extends CoreUserCommand {
 
 	public function __construct(Main $plugin) {
-		$this->plugin = $plugin;
+		parent::__construct($plugin, "duel", "Allow's you to duel another player", "/duel <name>", "fight", "battle", "1v1");
+		$this->setPermission("duels.command.duel");
 	}
 
-	public function onCommand(CommandSender $sender, Command $cmd, $label, array $args) {
-		if($sender instanceof Player) {
-			if(isset($args[0])) {
-				if(($requester = $this->plugin->getServer()->getPlayer($args[0])) instanceof Player) {
-					if(!($sSession = $this->plugin->sessionManager->get($sender->getName())) instanceof PlayerSession) {
-						$sender->kick(TF::RED . "Invalid session, rejoin to enjoy duels!", false);
-						return true;
-					}
-					if(!($rSession = $this->plugin->sessionManager->get($requester->getName())) instanceof PlayerSession) {
-						$requester->kick(TF::RED . "Invalid session, rejoin to enjoy duels!", false);
-					}
-					if($sender->getName() === $requester->getName()) {
-						$sender->sendMessage(TF::RED . "You cannot duel yourself!");
-						return;
-					}
-					if($sSession->hasRequest($requester->getName())) {
-						if(!$sSession->inDuel()) {
-							if(!$rSession->inDuel()) {
-								$sSession->removeRequest($requester->getName());
-								$arena = $this->plugin->getArenaManager()->find();
-								if((!$arena instanceof Arena) or isset($this->plugin->duelManager->duels[$arena->getId()])) {
-									$sender->sendMessage(TF::RED . "Cannot find an open arena!");
-									return true;
-								}
-								$this->plugin->arenaManager->remove($arena->getId());
-								$requester->sendMessage(TF::GOLD . TF::BOLD . $sender->getName() . TF::RESET . TF::GREEN . " has accepted your Duel request!");
-								$sender->sendMessage(TF::GREEN . "You have accepted a Duel request from " . TF::GOLD . TF::BOLD . $requester->getName() . TF::RESET . TF::GREEN . "!");
-								$duel = new Duel($this->plugin, Duel::TYPE_1V1, $arena, ($rSession->lastSelectedKit instanceof Kit and !($rSession->lastSelectedKit instanceof RandomKit)) ? $rSession->lastSelectedKit : $this->plugin->getKitManager()->findRandom());
-								$rSession->lastSelectedKit = null;
-								$duel->addPlayer($sender);
-								$duel->addPlayer($requester);
-								$this->plugin->duelManager->duels[$arena->getId()] = $duel;
-								return true;
-							} else {
-								$sender->sendMessage(TF::GOLD . $requester->getName() . TF::RED . " is currently in a duel, try again in a moment!");
-								return true;
-							}
+	public function onRun(DuelsPlayer $player, array $args) {
+		if(isset($args[0])) {
+			$target = $this->getPlugin()->getServer()->getPlayer($args[0]);
+			if($target instanceof DuelsPlayer) {
+				if(!$player->inDuel()) {
+					if(!$target->inDuel()) {
+						if($target->hasRequestFrom($player)) {
+							// initiate duel
 						} else {
-							$sender->sendMessage(TF::RED . "You cannot accept duel request while in a duel!");
-							return true;
+							$target->addRequest($player);
+							LanguageManager::translateForPlayer($player, "NEW_DUEL_REQUEST", [$player->getName()]);
+							$target->sendMessage($this->getPlugin()->getLangugaeManger()->translateForPlayer($player, "NEW_DUEL_REQUEST", [$player->getName()]));
+							$player->sendMessage($this->getPlugin()->getLangugaeManger()->translateForPlayer($player, "DUEL_REQUEST_SENT", [$target->getName()]));
 						}
 					} else {
-						if(!$rSession->hasRequest($sender->getName())) {
-							$rSession->addRequest($sender, $requester);
-							$sender->sendMessage(TF::AQUA . "Sent a Duel request to " . TF::BOLD . TF::GREEN . $requester->getName() . TF::RESET . TF::AQUA . "!");
-							return true;
-						} else {
-							$sender->sendMessage(TF::RED . "You've already sent " . TF::GOLD . $requester->getName() . TF::RED . " a request!");
-							return true;
-						}
+						$player->sendMessage($this->getPlugin()->getLangugaeManger()->translateForPlayer($player, "USER_ALREADY_IN_DUEL", [$target->getName()]));
 					}
 				} else {
-					$sender->sendMessage(TF::RED . $args[0] . " isn't online!");
-					return true;
+					$player->sendMessage($this->getPlugin()->getLangugaeManger()->translateForPlayer($player, "CANT_SEND_REQUEST_WHILE_IN_DUEL"));
 				}
 			} else {
-				$sender->sendMessage(TF::RED . "Please specify a player!");
-				return true;
+				$player->sendMessage($this->getPlugin()->getLangugaeManger()->translateForPlayer($player, "USER_NOT_ONLINE", [$args[0]]));
 			}
 		} else {
-			$sender->sendMessage(TF::RED . "Please run this command in-game!");
-			return true;
+			$player->sendMessage($this->getPlugin()->getLangugaeManger()->translateForPlayer($player, "PARTY_USAGE_MESSAGE"));
 		}
 	}
 
