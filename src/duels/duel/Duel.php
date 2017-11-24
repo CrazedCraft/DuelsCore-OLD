@@ -15,13 +15,13 @@ use core\game\Match;
 use core\language\LanguageManager;
 use duels\DuelsPlayer;
 
-class Duel extends Match {
+abstract class Duel extends Match {
 
 	/** @var DuelManager */
 	private $manager;
 
 	public function __construct(DuelManager $manager) {
-		$this->manager = $manager;
+		parent::__construct($manager);
 	}
 
 	/**
@@ -30,6 +30,5 @@ class Duel extends Match {
 	public function getManager() {
 		return $this->manager;
 	}
-
 
 }

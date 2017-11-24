@@ -23,4 +23,22 @@ class DuelsPlayer extends CorePlayer {
 	/** @var array */
 	public $requests = [];
 
+	/**
+	 * Check if the player has requests enabled
+	 *
+	 * @return bool
+	 */
+	public function hasRequestsEnabled() : bool {
+		return $this->requestsEnabled;
+	}
+
+	/**
+	 * Set if the player has requests enabled
+	 *
+	 * @param bool $value
+	 */
+	public function setRequestsEnabled(bool $value = true) {
+		$this->requestsEnabled = $value;
+	}
+
 }

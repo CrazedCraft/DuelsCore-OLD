@@ -12,25 +12,27 @@
 namespace duels\command\commands;
 
 use core\command\CoreUserCommand;
-use core\language\LanguageManager;
+use core\CorePlayer;
 use duels\DuelsPlayer;
 use duels\Main;
 
 class ToggleDuelCommand extends CoreUserCommand {
 
 	public function __construct(Main $plugin) {
-		parent::__construct($plugin->getCore(), "toggleduels", "Toggle's your ability to receive duel requests", "/toggleduels", ["toggleduel", "disableduels"]);
-		$this->setPermission("duels.command.toggleduels");
+		parent::__construct($plugin->getCore(), "toggleduels", "Toggle's your ability to receive duel requests", "/toggleduels", ["toggleduel", "disableduels", "requests"]);
+		$this->setPermission("duels.command.togglerequests");
 	}
 
-	public function onRun(DuelsPlayer $player, array $args) {
-		if($player->hasRequestsEnabled()) {
-			$player->setRequests(false);
-			LanguageManager::translateForPlayer($player, "DISABLED_DUEL_REQUESTS");
-		} else {
-			$player->setRequests(true);
-			LanguageManager::translateForPlayer($player, "ENABLED_DUEL_REQUESTS");
-		}
+	/**
+	 * @param CorePlayer|DuelsPlayer $player
+	 * @param array      $args
+	 *
+	 * @return bool
+	 */
+	public function onRun(CorePlayer $player, array $args) {
+		$player->setRequestsEnabled($current = !$player->hasRequestsEnabled());
+		$player->sendTranslatedMessage(($current ? "ENABLED" : "DISABLED") . "_DUEL_REQUESTS");
+		return true;
 	}
 
 }

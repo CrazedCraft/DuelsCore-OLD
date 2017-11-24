@@ -13,6 +13,7 @@ namespace duels;
 use core\util\traits\CorePluginReference;
 use duels\duel\DuelManager;
 use pocketmine\plugin\PluginBase;
+use pocketmine\utils\PluginException;
 
 class Main extends PluginBase {
 
@@ -25,6 +26,12 @@ class Main extends PluginBase {
 	private $duelManager;
 
 	public function onEnable() {
+		$components = $this->getServer()->getPluginManager()->getPlugin("Components");
+		if(!$components instanceof \core\Main) {
+			throw new PluginException("Components plugin isn't loaded!");
+		}
+		$this->setCore($components);
+
 		$this->setListener();
 		$this->setDuelManager();
 	}
@@ -35,6 +42,12 @@ class Main extends PluginBase {
 	public function onDisable() {
 		$this->listener->close();
 		$this->duelManager->close();
+	}
+
+	protected function registerCommands() {
+		$this->getCore()->getCommandMap()->registerAll([
+
+		]);
 	}
 
 	/**
