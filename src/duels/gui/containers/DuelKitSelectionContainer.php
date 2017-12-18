@@ -10,6 +10,7 @@ namespace duels\gui\containers;
 
 use core\CorePlayer;
 use core\gui\item\GUIItem;
+use duels\DuelsPlayer;
 use duels\gui\item\kit\KitGUIItem;
 use duels\Main;
 use duels\session\PlayerSession;
@@ -26,11 +27,13 @@ class DuelKitSelectionContainer extends KitSelectionContainer {
 		$pSession = $sSession = $plugin->sessionManager->get($player->getName());
 		if($pSession instanceof PlayerSession) {
 			$entity = $pSession->lastTapped;
-			$eSession = $rSession = $plugin->sessionManager->get($entity->getName());
-			if($eSession instanceof PlayerSession) {
-				$pSession->lastSelectedKit = $item->getKit();
-				$rSession->addRequest($player, $entity, $item->getName());
-				$player->sendMessage(TF::AQUA . "Sent a Duel request to " . TF::BOLD . TF::GREEN . $entity->getName() . TF::RESET . TF::AQUA . "!");
+			if($entity instanceof DuelsPlayer) {
+				$eSession = $rSession = $plugin->sessionManager->get($entity->getName());
+				if ($eSession instanceof PlayerSession) {
+					$pSession->lastSelectedKit = $item->getKit();
+					$rSession->addRequest($player, $entity, $item->getName());
+					$player->sendMessage(TF::AQUA . "Sent a Duel request to " . TF::BOLD . TF::GREEN . $entity->getName() . TF::RESET . TF::AQUA . "!");
+				}
 			}
 		}
 		return false; // don't remove the item
