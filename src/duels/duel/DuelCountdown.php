@@ -52,18 +52,11 @@ class DuelCountdown extends PluginTask {
 					$this->duel->end();
 					return;
 				} elseif($this->duel->getType() === Duel::TYPE_2V2) {
-					$teams = [];
-					foreach($this->duel->getPlayers() as $player) {
-						$ses = $this->plugin->getSessionManager()->get($player->getName());
-						if($ses instanceof PlayerSession) {
-							if($ses->inTeam()) {
-								$teams[$ses->getTeam()] = $player;
-							}
+					foreach($this->duel->teams as $team) {
+						if(count($team) < 1) {
+							$this->duel->end();
+							return;
 						}
-					}
-					foreach($teams as $team) if(count($team) < 1)  {
-						$this->duel->end();
-						return;
 					}
 				}
 				$time = Main::printSeconds($this->duelTime);

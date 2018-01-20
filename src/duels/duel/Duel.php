@@ -30,7 +30,7 @@ class Duel {
 	private $arena;
 	private $countdown = null;
 	private $ended = false;
-	private $teams = [];
+	public $teams = [];
 
 	/** @var BossBar */
 	private $bossBar = null;
