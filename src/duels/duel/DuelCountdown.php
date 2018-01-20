@@ -4,6 +4,7 @@ namespace duels\duel;
 
 use duels\Main;
 use duels\session\PlayerSession;
+use pocketmine\Player;
 use pocketmine\scheduler\PluginTask;
 use pocketmine\utils\TextFormat as TF;
 
@@ -53,7 +54,13 @@ class DuelCountdown extends PluginTask {
 					return;
 				} elseif($this->duel->getType() === Duel::TYPE_2V2) {
 					foreach($this->duel->teams as $team) {
-						if(count($team) < 1) {
+						$count = 0;
+						foreach($team as $key => $player) {
+							if($player instanceof Player and $player->isOnline()) {
+								$count++;
+							}
+						}
+						if($count < 1) {
 							$this->duel->end();
 							return;
 						}
