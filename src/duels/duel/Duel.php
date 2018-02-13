@@ -169,7 +169,7 @@ class Duel {
 				}
 				$session->setStatus(PlayerSession::STATUS_COUNTDOWN);
 				if(!$this->kit instanceof Kit) {
-					$this->kit = $this->plugin->kitManager->findRandom();
+					$this->kit = $this->plugin->kitManager->getRandomKit();
 				}
 				if($this->type === Duel::TYPE_2V2) {
 					if($session->getTeam() === "0")
@@ -218,7 +218,10 @@ class Duel {
 	public function start() {
 		$this->teleportPlayers();
 		foreach($this->players as $p) {
-			$this->plugin->kitManager->apply($p, $this->kit);
+			if($this->kit->getType() === Kit::TYPE_RANDOM) {
+				$this->kit = $this->kit->getManager()->getRandomKit();
+			}
+			$this->kit->applyTo($p);
 			foreach($this->players as $opponent) {
 				if($p->getName() === $opponent->getName()) continue;
 				$p->despawnFrom($opponent);

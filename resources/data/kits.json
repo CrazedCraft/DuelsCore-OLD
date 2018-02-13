@@ -1,0 +1,675 @@
+[
+	{
+		"name": "&l&3Random",
+		"image": "http://jacknoordhuis.net/minecraft/icons/items/279-0.png",
+		"display_item": {
+			"id": 279
+		},
+		"type": "random"
+	},
+	{
+		"name": "&l&aUHC",
+		"image": "http://jacknoordhuis.net/minecraft/icons/items/322-0.png",
+		"display_item": {
+			"id": 322
+		},
+		"type": "kit",
+		"items": {
+			"0": {
+				"id": 276,
+				"enchantments": [
+					{
+						"name": 9,
+						"level": 3
+					}
+				]
+			},
+			"1": {
+				"id": 332,
+				"count": 16
+			},
+			"2": {
+				"id": 261,
+				"enchantments": [
+					{
+						"name": 19,
+						"level": 4
+					}
+				]
+			},
+			"3": {
+				"id": 322,
+				"count": 3
+			},
+			"5": {
+				"id": 364,
+				"count": 64
+			},
+			"7": {
+				"id": 262,
+				"count": 64
+			}
+		},
+		"armor": [
+			{
+				"id": 310,
+				"enchantments": [
+					{
+						"name": 4
+					}
+				]
+			},
+			{
+				"id": 307
+			},
+			{
+				"id": 308,
+				"enchantments": [
+					{
+						"name": 4
+					}
+				]
+			},
+			{
+				"id": 313,
+				"enchantments": [
+					{
+						"name": 2
+					}
+				]
+			}
+		]
+	},
+	{
+		"name": "&l&aArcher",
+		"image": "http://jacknoordhuis.net/minecraft/icons/items/261-0.png",
+		"display_item": {
+			"id": 261
+		},
+		"type": "kit",
+		"items": {
+			"0": {
+				"id": 261,
+				"enchantments": [
+					{
+						"name": 20,
+						"level": 2
+					},
+					{
+						"name": 22
+					}
+				]
+			},
+			"1": {
+				"id": 262,
+				"count": 1
+			},
+			"5": {
+				"id": 364,
+				"count": 64
+			}
+		},
+		"armor": [
+			{
+				"id": 298,
+				"enchantments": [
+					{
+						"name": 2
+					}
+				]
+			},
+			{
+				"id": 299,
+				"enchantments": [
+					{
+						"name": 2
+					}
+				]
+			},
+			{
+				"id": 300,
+				"enchantments": [
+					{
+						"name": 2
+					}
+				]
+			},
+			{
+				"id": 301,
+				"enchantments": [
+					{
+						"name": 2
+					}
+				]
+			}
+		]
+	},
+	{
+		"name": "&l&aCombo",
+		"image": "http://jacknoordhuis.net/minecraft/icons/items/349-3.png",
+		"display_item": {
+			"id": 462
+		},
+		"type": "kit",
+		"items": {
+			"0": {
+				"id": 276,
+				"enchantments": [
+					{
+						"name": 9,
+						"level": 2
+					},
+					{
+						"name": 13
+					},
+					{
+						"name": 17,
+						"level": 10
+					}
+				]
+			},
+			"1": {
+				"id": 466,
+				"count": 64
+			},
+			"2": {
+				"id": 373,
+				"meta": 32
+			},
+			"3": {
+				"id": 373,
+				"meta": 16
+			},
+			"4": {
+				"id": 373,
+				"meta": 32
+			},
+			"5": {
+				"id": 373,
+				"meta": 16
+			},
+			"7": {
+				"id": 364,
+				"count": 64
+			}
+		},
+		"armor": [
+			{
+				"id": 310,
+				"enchantments": [
+					{
+						"name": 0,
+						"level": 4
+					},
+					{
+						"name": 17,
+						"level": 4
+					}
+				]
+			},
+			{
+				"id": 311,
+				"enchantments": [
+					{
+						"name": 0,
+						"level": 4
+					},
+					{
+						"name": 17,
+						"level": 4
+					}
+				]
+			},
+			{
+				"id": 312,
+				"enchantments": [
+					{
+						"name": 0,
+						"level": 4
+					},
+					{
+						"name": 17,
+						"level": 4
+					}
+				]
+			},
+			{
+				"id": 313,
+				"enchantments": [
+					{
+						"name": 0,
+						"level": 4
+					},
+					{
+						"name": 17,
+						"level": 4
+					}
+				]
+			}
+		]
+	},
+	{
+		"name": "&l&aGapple",
+		"image": "http://jacknoordhuis.net/minecraft/icons/items/466-0.gif",
+		"display_item": {
+			"id": 466
+		},
+		"type": "kit",
+		"items": {
+			"0": {
+				"id": 276,
+				"enchantments": [
+					{
+						"name": 9,
+						"level": 2
+					},
+					{
+						"name": 13,
+						"level": 2
+					},
+					{
+						"name": 17,
+						"level": 2
+					}
+				]
+			},
+			"2": {
+				"id": 466,
+				"count": 64
+			},
+			"5": {
+				"id": 364,
+				"count": 64
+			}
+		},
+		"armor": [
+			{
+				"id": 310,
+				"enchantments": [
+					{
+						"name": 0,
+						"level": 4
+					},
+					{
+						"name": 17,
+						"level": 3
+					}
+				]
+			},
+			{
+				"id": 311,
+				"enchantments": [
+					{
+						"name": 0,
+						"level": 4
+					},
+					{
+						"name": 17,
+						"level": 3
+					}
+				]
+			},
+			{
+				"id": 312,
+				"enchantments": [
+					{
+						"name": 0,
+						"level": 4
+					},
+					{
+						"name": 17,
+						"level": 3
+					}
+				]
+			},
+			{
+				"id": 313,
+				"enchantments": [
+					{
+						"name": 0,
+						"level": 4
+					},
+					{
+						"name": 17,
+						"level": 3
+					}
+				]
+			}
+		]
+	},
+	{
+		"name": "&l&aDiamond",
+		"image": "http://jacknoordhuis.net/minecraft/icons/items/310-0.png",
+		"display_item": {
+			"id": 310
+		},
+		"type": "kit",
+		"items": {
+			"0": {
+				"id": 276
+			},
+			"1": {
+				"id": 261
+			},
+			"3": {
+				"id": 364,
+				"count": 64
+			},
+			"5": {
+				"id": 262,
+				"count": 32
+			}
+		},
+		"armor": [
+			{
+				"id": 310,
+				"enchantments": [
+					{
+						"name": 4
+					}
+				]
+			},
+			{
+				"id": 311,
+				"enchantments": [
+					{
+						"name": 4
+					}
+				]
+			},
+			{
+				"id": 312,
+				"enchantments": [
+					{
+						"name": 4
+					}
+				]
+			},
+			{
+				"id": 313,
+				"enchantments": [
+					{
+						"name": 4
+					},
+					{
+						"name": 2,
+						"level": 4
+					}
+				]
+			}
+		]
+	},
+	{
+		"name": "&l&aIron",
+		"image": "http://jacknoordhuis.net/minecraft/icons/items/306-0.png",
+		"display_item": {
+			"id": 306
+		},
+		"type": "kit",
+		"items": {
+			"0": {
+				"id": 267
+			},
+			"1": {
+				"id": 261
+			},
+			"3": {
+				"id": 364,
+				"count": 64
+			},
+			"5": {
+				"id": 262,
+				"count": 32
+			}
+		},
+		"armor": [
+			{
+				"id": 306
+			},
+			{
+				"id": 307
+			},
+			{
+				"id": 308
+			},
+			{
+				"id": 309,
+				"enchantments": [
+					{
+						"name": 2,
+						"level": 4
+					}
+				]
+			}
+		]
+	},
+	{
+		"name": "&l&aSG",
+		"image": "http://jacknoordhuis.net/minecraft/icons/items/346-0.png",
+		"display_item": {
+			"id": 346
+		},
+		"type": "kit",
+		"items": {
+			"0": {
+				"id": 272
+			},
+			"1": {
+				"id": 261
+			},
+			"2": {
+				"id": 322
+			},
+			"3": {
+				"id": 400,
+				"count": 2
+			},
+			"4": {
+				"id": 360,
+				"count": 2
+			},
+			"5": {
+				"id": 297
+			},
+			"6": {
+				"id": 262,
+				"count": 8
+			}
+		},
+		"armor": [
+			{
+				"id": 314
+			},
+			{
+				"id": 307
+			},
+			{
+				"id": 304
+			},
+			{
+				"id": 309
+			}
+		]
+	},
+	{
+		"name": "&l&aIron Soup",
+		"image": "http://jacknoordhuis.net/minecraft/icons/items/282-0.png",
+		"display_item": {
+			"id": 282
+		},
+		"type": "kit",
+		"items": {
+			"0": {
+				"id": 276,
+				"enchantments": [
+					{
+					"name": 9,
+					"level": 3
+					}
+				]
+			},
+			"1": {
+				"id": 282
+			},
+			"2": {
+				"id": 282
+			},
+			"3": {
+				"id": 282
+			},
+			"4": {
+				"id": 282
+			},
+			"5": {
+				"id": 282
+			},
+			"6": {
+				"id": 282
+			},
+			"7": {
+				"id": 282
+			},
+			"8": {
+				"id": 282
+			},
+			"9": {
+				"id": 282
+			},
+			"10": {
+				"id": 282
+			},
+			"11": {
+				"id": 282
+			},
+			"12": {
+				"id": 282
+			},
+			"13": {
+				"id": 282
+			},
+			"14": {
+				"id": 282
+			},
+			"15": {
+				"id": 282
+			},
+			"16": {
+				"id": 282
+			},
+			"17": {
+				"id": 282
+			},
+			"18": {
+				"id": 282
+			},
+			"19": {
+				"id": 282
+			},
+			"20": {
+				"id": 282
+			}
+		},
+		"armor": [
+			{
+				"id": 306,
+				"enchantments": [
+					{
+						"name": 0,
+						"level": 2
+					}
+				]
+			},
+			{
+				"id": 307,
+				"enchantments": [
+					{
+						"name": 0,
+						"level": 2
+					}
+				]
+			},
+			{
+				"id": 308,
+				"enchantments": [
+					{
+						"name": 0,
+						"level": 2
+					}
+				]
+			},
+			{
+				"id": 309,
+				"enchantments": [
+					{
+						"name": 0,
+						"level": 2
+					}
+				]
+			}
+		]
+	},
+	{
+		"name": "&l&aAxe",
+		"image": "http://jacknoordhuis.net/minecraft/icons/items/258-0.png",
+		"display_item": {
+			"id": 258
+		},
+		"type": "kit",
+		"items": {
+			"0": {
+				"id": 258,
+				"enchantments": [
+					{
+						"name": 9
+					}
+				]
+			},
+			"1": {
+				"id": 322,
+				"count": 16
+			},
+			"2": {
+				"id": 438,
+				"meta": 22
+			},
+			"3": {
+				"id": 438,
+				"meta": 22
+			},
+			"4": {
+				"id": 438,
+				"meta": 22
+			},
+			"5": {
+				"id": 438,
+				"meta": 22
+			},
+			"6": {
+				"id": 438,
+				"meta": 22
+			},
+			"7": {
+				"id": 438,
+				"meta": 22
+			},
+			"8": {
+				"id": 438,
+				"meta": 22
+			}
+		},
+		"armor": [
+			{
+				"id": 306
+			},
+			{
+				"id": 307
+			},
+			{
+				"id": 308
+			},
+			{
+				"id": 309
+			}
+		]
+	}
+]

@@ -76,7 +76,7 @@ class DuelManager {
 		if((!$arena instanceof Arena) or isset($this->duels[$arena->getId()]) or $arena->inUse) return;
 		$arena->inUse = true;
 		$this->plugin->getArenaManager()->remove($arena->getId());
-		$this->duels[$arena->getId()] = $duel = new Duel($this->plugin, $type, $arena, ($kit instanceof Kit ? $kit : $this->plugin->getKitManager()->findRandom()));
+		$this->duels[$arena->getId()] = $duel = new Duel($this->plugin, $type, $arena, ($kit instanceof Kit ? $kit : $this->plugin->getKitManager()->getRandomKit()));
 		$duel->setOs($duel->matchesOS($deviceOs) ? Duel::OS_MOBILE : Duel::OS_WINDOWS);
 	}
 

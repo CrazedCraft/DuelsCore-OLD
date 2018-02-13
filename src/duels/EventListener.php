@@ -9,7 +9,6 @@ use duels\duel\Duel;
 use duels\gui\item\duel\DuelKitRequestSelector;
 use duels\gui\item\kit\KitSelector;
 use duels\kit\Kit;
-use duels\kit\RandomKit;
 use duels\session\PlayerSession;
 use pocketmine\block\Block;
 use pocketmine\event\entity\EntityDamageByEntityEvent;
@@ -182,7 +181,7 @@ class EventListener implements Listener {
 										$this->plugin->arenaManager->remove($arena->getId());
 										$target->sendMessage(TF::GOLD . TF::BOLD . $attacker->getName() . TF::RESET . TF::GREEN . " has accepted your Duel request!");
 										$attacker->sendMessage(TF::GREEN . "You have accepted a Duel request from " . TF::GOLD . TF::BOLD . $attacker->getName() . TF::RESET . TF::GREEN . "!");
-										$duel = new Duel($this->plugin, Duel::TYPE_1V1, $arena, ($tSession->lastSelectedKit instanceof Kit and !($tSession->lastSelectedKit instanceof RandomKit)) ? $tSession->lastSelectedKit : $this->plugin->getKitManager()->findRandom());
+										$duel = new Duel($this->plugin, Duel::TYPE_1V1, $arena, ($tSession->lastSelectedKit instanceof Kit and $tSession->lastSelectedKit->getType() === Kit::TYPE_KIT) ? $tSession->lastSelectedKit : $this->plugin->getKitManager()->getRandomKit());
 										$tSession->lastSelectedKit = null;
 										$duel->addPlayer($target);
 										$duel->addPlayer($attacker);

@@ -2,24 +2,40 @@
 
 namespace duels\kit;
 
-use core\Utils as CUtils;
+use core\exception\InvalidConfigException;
+use core\language\LanguageUtils;
+use core\util\ConfigUtils;
+use duels\DuelsPlayer;
 use pocketmine\item\Item;
-use pocketmine\nbt\tag\StringTag;
-use pocketmine\utils\TextFormat;
 
 class Kit {
 
+	/**
+	 * Load a kit from data
+	 *
+	 * @param KitManager
+	 * @param array $data
+	 *
+	 * @return Kit
+	 */
+	public static function fromData(KitManager $manager, array $data) : Kit {
+		return new Kit($manager, LanguageUtils::translateColors($data["name"]), ConfigUtils::parseArrayItem($data["display_item"]), $data["type"], ConfigUtils::parseArrayItems($data["items"] ?? []), ConfigUtils::parseArrayItems($data["armor"] ?? []), $data["image"]);
+	}
+
+	/** @var KitManager */
+	private $manager;
+
 	/** @var string */
-	private $name = "";
+	private $name;
+
+	/** @var string */
+	private $displayName;
 
 	/** @var Item */
-	protected $displayItem;
+	private $displayItem;
 
 	/** @var string */
 	private $type = "";
-
-	/** @var string */
-	private $description = "";
 
 	/** @var Item[] */
 	private $items = [];
@@ -30,50 +46,95 @@ class Kit {
 	/** @var string */
 	private $imageFile = "";
 
-	public function __construct(string $name, Item $displayItem, string $type, string $description, array $items, array $armor, string $imageFile = "0-0.png") {
-		$this->name = $name;
+	const TYPE_RANDOM = "random";
+	const TYPE_KIT = "kit";
+
+	public function __construct(KitManager $manager, string $name, Item $displayItem, string $type, array $items, array $armor, string $imageFile = "0-0.png") {
+		$this->manager = $manager;
+
+		$this->name = LanguageUtils::cleanString($name);
+		$this->displayName = $name;
+
 		$displayItem->setCustomName($name . " Kit");
-		$tag = $displayItem->getNamedTag();
-		$tag->KitName = new StringTag("KitName", $this->getName());
-		$displayItem->setNamedTag($tag);
 		$this->displayItem = $displayItem;
+
 		$this->type = $type;
-		$this->description = $description;
+
 		$this->items = $items;
 		$this->armor = $armor;
+
 		$this->imageFile = $imageFile;
 	}
 
-	public function getName() {
-		return CUtils::cleanString($this->name);
+	/**
+	 * @return KitManager
+	 */
+	public function getManager() : KitManager {
+		return $this->manager;
 	}
 
-	public function getDisplayName() {
+	/**
+	 * @return string
+	 */
+	public function getName() : string {
 		return $this->name;
 	}
 
-	public function getDisplayItem() {
+	/**
+	 * @return string
+	 */
+	public function getDisplayName() : string {
+		return $this->displayName;
+	}
+
+	/**
+	 * @return Item
+	 */
+	public function getDisplayItem() : Item {
 		return $this->displayItem;
 	}
 
-	public function getType() {
+	/**
+	 * @return string
+	 */
+	public function getType() : string {
 		return $this->type;
 	}
 
-	public function getDescription() {
-		return $this->description;
-	}
-
-	public function getItems() {
+	/**
+	 * @return Item[]
+	 */
+	public function getItems() : array {
 		return $this->items;
 	}
 
-	public function getArmor() {
+	/**
+	 * @return Item[]
+	 */
+	public function getArmor() : array {
 		return $this->armor;
 	}
 
-	public function getImageFile() {
+	/**
+	 * @return string
+	 */
+	public function getImageFile() : string {
 		return $this->imageFile;
+	}
+
+	/**
+	 * Apply this kit to a player
+	 *
+	 * @param DuelsPlayer $player
+	 */
+	public function applyTo(DuelsPlayer $player) : void {
+		if($this->type === self::TYPE_KIT) {
+			$inv = $player->getInventory();
+			foreach($this->items as $i => $item) {
+				$inv->setItem($i, $item);
+			}
+			$inv->setArmorContents($this->armor);
+		}
 	}
 
 }

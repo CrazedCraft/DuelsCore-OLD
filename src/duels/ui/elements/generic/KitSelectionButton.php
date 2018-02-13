@@ -30,7 +30,7 @@ abstract class KitSelectionButton extends Button {
 	public function __construct(Kit $kit) {
 		$this->kitName = $kit->getName();
 		parent::__construct($kit->getDisplayName() . " Kit");
-		$this->addImage(Button::IMAGE_TYPE_URL, "http://jacknoordhuis.net/minecraft/icons/items/{$kit->getImageFile()}");
+		$this->addImage(Button::IMAGE_TYPE_URL, $kit->getImageFile());
 	}
 
 	/**
@@ -44,7 +44,7 @@ abstract class KitSelectionButton extends Button {
 	 * @return \duels\kit\Kit|null
 	 */
 	public function getKit() {
-		return Main::getInstance()->getKitManager()->get($this->kitName);
+		return Main::getInstance()->getKitManager()->getKit($this->kitName);
 	}
 
 }

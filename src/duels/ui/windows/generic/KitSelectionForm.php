@@ -35,7 +35,7 @@ abstract class KitSelectionForm extends SimpleForm {
 	}
 
 	public function setDefaultKits() {
-		foreach(Main::getInstance()->getKitManager()->getAll() as $kit) {
+		foreach(Main::getInstance()->getKitManager()->getKits() as $kit) {
 			$this->addButton(new $this->buttonClass($kit));
 		}
 	}

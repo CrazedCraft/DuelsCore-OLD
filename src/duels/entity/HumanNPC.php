@@ -159,7 +159,7 @@ class HumanNPC extends Human {
 											return;
 										}
 										$plugin->arenaManager->remove($arena->getId());
-										$duel = new Duel($plugin, Duel::TYPE_1V1, $arena, $plugin->getKitManager()->findRandom());
+										$duel = new Duel($plugin, Duel::TYPE_1V1, $arena, $plugin->getKitManager()->getRandomKit());
 										$session->lastSelectedKit = null;
 										foreach($players as $p) {
 											$duel->addPlayer($p);
@@ -188,7 +188,7 @@ class HumanNPC extends Human {
 											return;
 										}
 										$plugin->arenaManager->remove($arena->getId());
-										$duel = new Duel($plugin, Duel::TYPE_2V2, $arena, $plugin->getKitManager()->findRandom());
+										$duel = new Duel($plugin, Duel::TYPE_2V2, $arena, $plugin->getKitManager()->getRandomKit());
 										$session->lastSelectedKit = null;
 										foreach($players as $p) {
 											$duel->addPlayer($p);

@@ -25,7 +25,7 @@ use core\Utils;
 use duels\arena\Arena;
 use duels\duel\Duel;
 use duels\gui\item\kit\KitGUIItem;
-use duels\kit\RandomKit;
+use duels\kit\Kit;
 use duels\Main;
 use duels\session\PlayerSession;
 use pocketmine\Player;
@@ -41,8 +41,8 @@ class PartyEventKitSelectionContainer extends ChestGUI {
 	public function __construct(Main $plugin) {
 		parent::__construct($plugin->getCore());
 
-		foreach($plugin->getKitManager()->getSelectionItems() as $item) {
-			$this->defaultContents[] = new KitGUIItem($item);
+		foreach($plugin->getKitManager()->getKits() as $kit) {
+			$this->defaultContents[] = new KitGUIItem($kit);
 		}
 		$this->setContents($this->defaultContents);
 	}
@@ -81,7 +81,7 @@ class PartyEventKitSelectionContainer extends ChestGUI {
 					return false;
 				}
 				$plugin->arenaManager->remove($arena->getId());
-				$duel = new Duel($plugin, $session->lastSelectedPartyType, $arena, $item->getKit() instanceof RandomKit ? $plugin->getKitManager()->findRandom() : $item->getKit());
+				$duel = new Duel($plugin, $session->lastSelectedPartyType, $arena, $item->getKit()->getType() === Kit::TYPE_RANDOM ? $plugin->getKitManager()->getRandomKit() : $item->getKit());
 				$session->lastSelectedPartyType = "";
 				foreach($players as $p) {
 					if($duel->isJoinable() or $duel->getType() === Duel::TYPE_FFA) {

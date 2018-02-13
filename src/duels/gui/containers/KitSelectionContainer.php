@@ -14,7 +14,7 @@ use core\gui\container\ChestGUI;
 use core\gui\item\GUIItem;
 use duels\duel\Duel;
 use duels\gui\item\kit\KitGUIItem;
-use duels\kit\RandomKit;
+use duels\kit\Kit;
 use duels\Main;
 use duels\session\PlayerSession;
 use pocketmine\Player;
@@ -30,8 +30,8 @@ class KitSelectionContainer extends ChestGUI {
 	public function __construct(Main $plugin) {
 		parent::__construct($plugin->getCore());
 
-		foreach($plugin->getKitManager()->getSelectionItems() as $item) {
-			$this->defaultContents[] = new KitGUIItem($item, $this);
+		foreach($plugin->getKitManager()->getKits() as $kit) {
+			$this->defaultContents[] = new KitGUIItem($kit, $this);
 		}
 		$this->setContents($this->defaultContents);
 	}
@@ -57,7 +57,7 @@ class KitSelectionContainer extends ChestGUI {
 				$player->sendMessage(TF::RED . "Only the party leader can join a duel!");
 				return true;
 			}
-			Main::getInstance()->getDuelManager()->findDuel($player, Duel::TYPE_1V1, $item->getKit() instanceof RandomKit ? null : $item->getKit(), true);
+			Main::getInstance()->getDuelManager()->findDuel($player, Duel::TYPE_1V1, $item->getKit()->getType() === Kit::TYPE_RANDOM ? null : $item->getKit(), true);
 		} else {
 			$player->sendMessage(TF::RED . "You're already in a duel!");
 			return true;
