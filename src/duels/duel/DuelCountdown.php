@@ -10,16 +10,25 @@ use pocketmine\utils\TextFormat as TF;
 
 class DuelCountdown extends PluginTask {
 
+	/** @var Main */
 	private $plugin;
 
+	/** @var Duel */
 	private $duel;
 
+	/** @var int */
 	private $waitTime = 5;
 
+	/** @var int */
+	public $ffaWaitTime = 60; // give players 60 seconds to join a public ffa duel before starting
+
+	/** @var int */
 	private $duelTime = 600;
 
+	/** @var bool */
 	private $hasTeleported = false;
 
+	/** @var bool */
 	private $isActive = true;
 
 	public function __construct(Main $plugin, Duel $duel) {
@@ -42,8 +51,13 @@ class DuelCountdown extends PluginTask {
 						$this->duel->broadcastTip(TF::LIGHT_PURPLE . "Duel will begin in " . TF::BOLD . TF::YELLOW . (string)$this->waitTime . TF::RESET);
 						$this->waitTime--;
 					} else {
-						//$this->duel->getBossBar()->setText(TF::GRAY . "Waiting for players...");
-						$this->duel->broadcastTip(TF::LIGHT_PURPLE . "Waiting for players (" . TF::GREEN . count($this->duel->getPlayers()) . TF::LIGHT_PURPLE . "/" . TF::GREEN . $this->duel->getType()->getMaxPlayers() . TF::LIGHT_PURPLE . ")");
+						if($this->duel->getType()->getId() === DuelType::DUEL_TYPE_FFA and count($this->duel->players) >= $this->duel->getType()->getMinPlayers()) {
+							$this->duel->broadcastTip(TF::LIGHT_PURPLE . "FFA duel will begin in " . TF::LIGHT_PURPLE . $this->ffaWaitTime . TF::LIGHT_PURPLE . " second(s)");
+							$this->ffaWaitTime--;
+						} else {
+							//$this->duel->getBossBar()->setText(TF::GRAY . "Waiting for players...");
+							$this->duel->broadcastTip(TF::LIGHT_PURPLE . "Waiting for players (" . TF::GREEN . count($this->duel->getPlayers()) . TF::LIGHT_PURPLE . "/" . TF::GREEN . $this->duel->getType()->getMaxPlayers() . TF::LIGHT_PURPLE . ")");
+						}
 					}
 				} else {
 					$this->duel->start();

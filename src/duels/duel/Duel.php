@@ -9,6 +9,7 @@ use duels\kit\Kit;
 use duels\Main;
 use duels\session\PlayerSession;
 use pocketmine\inventory\PlayerInventory;
+use pocketmine\item\fuel\FuelItem;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat as TF;
 
@@ -29,7 +30,10 @@ class Duel {
 
 	private $status;
 	private $arena;
+
+	/** @var DuelCountdown|null */
 	private $countdown = null;
+
 	private $ended = false;
 	public $teams = [];
 
@@ -237,7 +241,11 @@ class Duel {
 	public function isJoinable() {
 		if($this->status !== self::STATUS_WAITING) return;
 
-		return count($this->players) < $this->type->getMinPlayers();
+		if($this->type->getId() === DuelType::DUEL_TYPE_FFA) {
+			return $this->countdown->ffaWaitTime > 0 and count($this->players) < $this->type->getMaxPlayers();
+		}
+
+		return count($this->players) < $this->type->getMaxPlayers();
 	}
 
 	public function getPlayers() {
