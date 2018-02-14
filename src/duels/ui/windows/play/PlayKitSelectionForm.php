@@ -1,4 +1,5 @@
 <?php
+
 /**
  * DuelsCore – PlayKitSelectionForm.php
  *
@@ -15,12 +16,18 @@
  *
  */
 
-namespace duels\ui\windows;
+namespace duels\ui\windows\play;
 
+use core\language\LanguageUtils;
+use duels\ui\elements\play\PlayKitSelectionButton;
 use duels\ui\windows\generic\KitSelectionForm;
 
 class PlayKitSelectionForm extends KitSelectionForm {
 
 	const FORM_UI_ID = "PLAY_KIT_SELECTION_FORM";
+
+	public function __construct() {
+		parent::__construct(LanguageUtils::translateColors("&l&eSelect a kit to play"), PlayKitSelectionButton::class);
+	}
 
 }

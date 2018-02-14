@@ -3,6 +3,7 @@
 namespace duels\npc;
 
 use duels\duel\Duel;
+use duels\duel\DuelType;
 use duels\entity\HumanNPC;
 use duels\Main;
 use pocketmine\entity\Entity;
@@ -10,6 +11,7 @@ use pocketmine\nbt\tag\Compound;
 use pocketmine\nbt\tag\DoubleTag;
 use pocketmine\nbt\tag\Enum;
 use pocketmine\nbt\tag\FloatTag;
+use pocketmine\nbt\tag\IntTag;
 use pocketmine\nbt\tag\ShortTag;
 use pocketmine\nbt\tag\StringTag;
 use pocketmine\utils\TextFormat as TF;
@@ -26,7 +28,7 @@ class NPCManager {
 	public function __construct(Main $plugin) {
 		$this->plugin = $plugin;
 		Entity::registerEntity(HumanNPC::class, true);
-		$this->data = ["0" => ["name" => TF::YELLOW . "» Play - 1v1 «", "pos" => ["x" => 0.5, "y" => 96, "z" => 69.5], "rotation" => ["yaw" => 180, "pitch" => 0,], "skin" => "default", "type" => Duel::TYPE_1V1], "1" => ["name" => TF::YELLOW . "» Play - 2v2 «", "pos" => ["x" => 69.5, "y" => 96, "z" => 0.5], "rotation" => ["yaw" => 90, "pitch" => 0,], "skin" => "default", "type" => Duel::TYPE_2V2]];
+		$this->data = ["0" => ["name" => TF::YELLOW . "» Play - 1v1 «", "pos" => ["x" => 0.5, "y" => 96, "z" => 69.5], "rotation" => ["yaw" => 180, "pitch" => 0,], "skin" => "default", "type" => DuelType::DUEL_TYPE_1V1], "1" => ["name" => TF::YELLOW . "» Play - 2v2 «", "pos" => ["x" => 69.5, "y" => 96, "z" => 0.5], "rotation" => ["yaw" => 90, "pitch" => 0,], "skin" => "default", "type" => DuelType::DUEL_TYPE_2v2]];
 		$this->spawn();
 	}
 
@@ -40,6 +42,7 @@ class NPCManager {
 			$this->NPCs[] = $entity;
 			$chunk->allowUnload = false;
 //			$skin = Skin::get($this->plugin->getDataFolder() . "skins" . DIRECTORY_SEPARATOR, "default");
+			$entity->setType($this->plugin->getDuelManager()->getDuelType($nbt["Type"]));
 			$entity->setCustomName($nbt["CustomName"]);
 			$entity->showPlaying(0);
 //			$entity->setSkin($skin["skin"], "Standard_Custom");
@@ -72,7 +75,7 @@ class NPCManager {
 
 				new ShortTag("Health", 20),
 
-				new StringTag("Type", $data["type"])
+				new IntTag("Type", $data["type"])
 
 			]);
 		}

@@ -7,8 +7,11 @@ use core\entity\text\UpdatableFloatingText;
 use core\gui\item\defaults\serverselector\ServerSelector;
 use core\gui\item\defaults\SpawnWarpItem;
 use core\util\traits\CorePluginReference;
-use duels\gui\containers\PartyEventKitSelectionContainer;
-use duels\gui\containers\PartyEventSelectionContainer;
+use duels\gui\containers\play\PlayDuelTypeSelectionContainer;
+use duels\gui\containers\play\PlayKitSelectionContainer;
+use duels\gui\containers\request\DuelRequestDuelTypeSelectionContainer;
+use duels\gui\containers\request\DuelRequestKitSelectionContainer;
+use duels\gui\item\duel\DuelKitRequestSelector;
 use duels\gui\item\party\PartyEventSelector;
 use core\language\LanguageUtils;
 use duels\arena\ArenaManager;
@@ -17,9 +20,6 @@ use duels\command\HubCommand;
 use duels\command\PartyCommand;
 use duels\duel\Duel;
 use duels\duel\DuelManager;
-use duels\gui\containers\DuelKitSelectionContainer;
-use duels\gui\containers\KitSelectionContainer;
-use duels\gui\item\duel\DuelKitRequestSelector;
 use duels\gui\item\kit\KitSelector;
 use duels\kit\KitManager;
 use duels\npc\NPCManager;
@@ -27,10 +27,10 @@ use duels\party\PartyManager;
 use duels\session\SessionManager;
 use duels\tasks\SessionCleanupTask;
 use duels\tasks\UpdateInfoTextTask;
-use duels\ui\elements\DuelRequestKitSelectionButton;
-use duels\ui\elements\PlayKitSelectionButton;
-use duels\ui\windows\DuelRequestKitSelectionForm;
-use duels\ui\windows\PlayKitSelectionForm;
+use duels\ui\windows\play\PlayDuelTypeSelectionForm;
+use duels\ui\windows\play\PlayKitSelectionForm;
+use duels\ui\windows\request\DuelRequestDuelTypeSelectionForm;
+use duels\ui\windows\request\DuelRequestKitSelectionForm;
 use pocketmine\item\Item;
 use pocketmine\level\Position;
 use pocketmine\math\Vector3;
@@ -121,8 +121,8 @@ class Main extends PluginBase {
 		$this->loadConfigs();
 		$this->setSessionManager();
 		$this->setArenaManager();
-		$this->setNPCManager();
 		$this->setDuelManager();
+		$this->setNPCManager();
 		$this->setKitManager();
 		$this->setPartyManager();
 		$this->registerGuiContainers();
@@ -293,20 +293,44 @@ class Main extends PluginBase {
 	 * Register the custom GUI containers
 	 */
 	protected function registerGuiContainers() {
+		$containers = [
+			[new PlayDuelTypeSelectionContainer($this), PlayDuelTypeSelectionContainer::CONTAINER_ID],
+			[new PlayKitSelectionContainer($this), PlayKitSelectionContainer::CONTAINER_ID],
+			[new DuelRequestDuelTypeSelectionContainer($this), DuelRequestDuelTypeSelectionContainer::CONTAINER_ID],
+			[new DuelRequestKitSelectionContainer($this), DuelRequestKitSelectionContainer::CONTAINER_ID],
+		];
+
 		$guiManager = $this->getCore()->getGuiManager();
-		$guiManager->registerContainer(new DuelKitSelectionContainer($this), DuelKitSelectionContainer::CONTAINER_ID, true);
-		$guiManager->registerContainer(new KitSelectionContainer($this), KitSelectionContainer::CONTAINER_ID, true);
-		$guiManager->registerContainer(new PartyEventSelectionContainer($this), PartyEventSelectionContainer::CONTAINER_ID, true);
-		$guiManager->registerContainer(new PartyEventKitSelectionContainer($this), PartyEventKitSelectionContainer::CONTAINER_ID, true);
+		foreach($containers as $container) {
+			try {
+				$guiManager->registerContainer($container[0], $container[1], true);
+			} catch(\ErrorException $e) {
+				$this->getLogger()->debug("Failed to register container class '" . (new \ReflectionObject($container[0]))->getShortName() . "''!");
+				$this->getLogger()->logException($e);
+			}
+		}
 	}
 
 	/**
 	 * Register the custom UI windows
 	 */
 	protected function registerUiWindows() {
+		$forms = [
+			[new PlayDuelTypeSelectionForm(), PlayDuelTypeSelectionForm::FORM_UI_ID],
+			[new PlayKitSelectionForm(), PlayKitSelectionForm::FORM_UI_ID],
+			[new DuelRequestDuelTypeSelectionForm(), DuelRequestDuelTypeSelectionForm::FORM_UI_ID],
+			[new DuelRequestKitSelectionForm(), DuelRequestKitSelectionForm::FORM_UI_ID],
+		];
+
 		$uiManager = $this->getCore()->getUiManager();
-		$uiManager->registerForm(new PlayKitSelectionForm(LanguageUtils::translateColors("&l&eSelect a kit to play"), PlayKitSelectionButton::class), PlayKitSelectionForm::FORM_UI_ID);
-		$uiManager->registerForm(new DuelRequestKitSelectionForm(LanguageUtils::translateColors("&l&eSelect a kit"), DuelRequestKitSelectionButton::class), DuelRequestKitSelectionForm::FORM_UI_ID);
+		foreach($forms as $form) {
+			try {
+				$uiManager->registerForm($form[0], $form[1], true);
+			} catch(\ErrorException $e) {
+				$this->getLogger()->debug("Failed to register form class '" . (new \ReflectionObject($form[0]))->getShortName() . "''!");
+				$this->getLogger()->logException($e);
+			}
+		}
 	}
 
 }

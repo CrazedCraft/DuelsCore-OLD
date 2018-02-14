@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Created by PhpStorm.
  * User: Jack
@@ -11,9 +12,8 @@ namespace duels\gui\item\duel;
 use core\CorePlayer;
 use core\gui\item\GUIItem;
 use core\language\LanguageUtils;
-use duels\gui\containers\DuelKitSelectionContainer;
-use duels\Main;
-use duels\ui\windows\DuelRequestKitSelectionForm;
+use duels\gui\containers\request\DuelRequestDuelTypeSelectionContainer;
+use duels\ui\windows\request\DuelRequestDuelTypeSelectionForm;
 use pocketmine\item\Item;
 use pocketmine\network\protocol\Info;
 
@@ -30,9 +30,9 @@ class DuelKitRequestSelector extends GUIItem {
 
 	public function onClick(CorePlayer $player) {
 		if($player->getPlayerProtocol() >= Info::PROTOCOL_120) {
-			$player->showModal($player->getCore()->getUIManager()->getForm(DuelRequestKitSelectionForm::FORM_UI_ID));
+			$player->showModal($player->getCore()->getUIManager()->getForm(DuelRequestDuelTypeSelectionForm::FORM_UI_ID));
 		} else {
-			$player->openGuiContainer($player->getCore()->getGuiManager()->getContainer(DuelKitSelectionContainer::CONTAINER_ID));
+			$player->openGuiContainer($player->getCore()->getGuiManager()->getContainer(DuelRequestDuelTypeSelectionContainer::CONTAINER_ID));
 		}
 	}
 

@@ -49,7 +49,13 @@ class PlayerSession {
 	/** @var string|null */
 	private $partyId = null;
 
-	/** @var null|string */
+	/** @var int|null */
+	public $lastSelectedPlayType = null;
+
+	/** @var int|null */
+	public $lastSelectedRequestType = null;
+
+	/** @var int|null */
 	public $lastSelectedPartyType = null;
 
 	/** @var bool */

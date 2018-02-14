@@ -16,12 +16,18 @@
  *
  */
 
-namespace duels\ui\windows;
+namespace duels\ui\windows\request;
 
+use core\language\LanguageUtils;
+use duels\ui\elements\request\DuelRequestKitSelectionButton;
 use duels\ui\windows\generic\KitSelectionForm;
 
 class DuelRequestKitSelectionForm extends KitSelectionForm {
 
 	const FORM_UI_ID = "DUEL_REQUEST_KIT_SELECTION_FORM";
+
+	public function __construct() {
+		parent::__construct(LanguageUtils::translateColors("&l&eSelect a kit"), DuelRequestKitSelectionButton::class);
+	}
 
 }

@@ -4,6 +4,7 @@ namespace duels\command;
 
 use duels\arena\Arena;
 use duels\duel\Duel;
+use duels\duel\DuelType;
 use duels\kit\Kit;
 use duels\Main;
 use duels\session\PlayerSession;
@@ -48,7 +49,7 @@ class DuelCommand implements CommandExecutor {
 								$this->plugin->arenaManager->remove($arena->getId());
 								$requester->sendMessage(TF::GOLD . TF::BOLD . $sender->getName() . TF::RESET . TF::GREEN . " has accepted your Duel request!");
 								$sender->sendMessage(TF::GREEN . "You have accepted a Duel request from " . TF::GOLD . TF::BOLD . $requester->getName() . TF::RESET . TF::GREEN . "!");
-								$duel = new Duel($this->plugin, Duel::TYPE_1V1, $arena, ($rSession->lastSelectedKit instanceof Kit and $rSession->lastSelectedKit->getType() === Kit::TYPE_KIT) ? $rSession->lastSelectedKit : $this->plugin->getKitManager()->getRandomKit());
+								$duel = new Duel($this->plugin, $this->plugin->duelManager->getDuelType(DuelType::DUEL_TYPE_1V1), $arena, ($rSession->lastSelectedKit instanceof Kit and $rSession->lastSelectedKit->getType() === Kit::TYPE_KIT) ? $rSession->lastSelectedKit : $this->plugin->getKitManager()->getRandomKit());
 								$rSession->lastSelectedKit = null;
 								$duel->addPlayer($sender);
 								$duel->addPlayer($requester);

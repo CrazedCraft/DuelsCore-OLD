@@ -2,19 +2,72 @@
 
 namespace duels\duel;
 
+use core\language\LanguageUtils;
 use duels\arena\Arena;
 use duels\kit\Kit;
 use duels\Main;
+use pocketmine\item\Item;
+use pocketmine\item\Skull;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat as TF;
 
 class DuelManager {
 
+	/** @var Duel[] */
 	public $duels = [];
+
+	/** @var DuelType[] */
+	private $types = [];
+
+	/** @var Main */
 	private $plugin;
 
 	public function __construct(Main $plugin) {
 		$this->plugin = $plugin;
+
+		$this->loadTypes();
+	}
+
+	/**
+	 * Load the default duel types
+	 */
+	private function loadTypes() : void {
+		$this->types[DuelType::DUEL_TYPE_1V1] = new DuelType($this, DuelType::DUEL_TYPE_1V1, LanguageUtils::translateColors("&l&31v1"), Item::get(Item::MOB_HEAD, Skull::TYPE_HUMAN, 1), "http://jacknoordhuis.net/minecraft/icons/items/397-3.png", 2, 2);
+		$this->types[DuelType::DUEL_TYPE_2v2] = new DuelType($this, DuelType::DUEL_TYPE_2v2, LanguageUtils::translateColors("&l&32v2"), Item::get(Item::MOB_HEAD, Skull::TYPE_HUMAN, 2), "http://jacknoordhuis.net/minecraft/icons/items/397-3.png", 4, 4);
+		$this->types[DuelType::DUEL_TYPE_FFA] = new DuelType($this, DuelType::DUEL_TYPE_FFA, LanguageUtils::translateColors("&l&3FFA"), Item::get(Item::MOB_HEAD, Skull::TYPE_DRAGON, 1), "http://jacknoordhuis.net/minecraft/icons/items/397-5.png", 24, 2);
+	}
+
+	/**
+	 * Check if a duel type exists
+	 *
+	 * @param int $id
+	 *
+	 * @return bool
+	 */
+	public function duelTypeExists(int $id) : bool {
+		return isset($this->types[$id]) and $this->types[$id] instanceof DuelType;
+	}
+
+	/**
+	 * Get a duel type
+	 *
+	 * @param int $id
+	 *
+	 * @return DuelType|null
+	 */
+	public function getDuelType(int $id) : ?DuelType {
+		if($this->duelTypeExists($id)) {
+			return $this->types[$id];
+		}
+
+		return null;
+	}
+
+	/**
+	 * @return DuelType[]
+	 */
+	public function getDuelTypes() : array {
+		return $this->types;
 	}
 
 	public function getAll() {
@@ -34,10 +87,17 @@ class DuelManager {
 		return isset($this->duels[$id]) and $this->duels[$id] instanceof Duel;
 	}
 
-	public function findDuel(Player $player, $type, Kit $kit = null, $checkOs = false) {
+	public function findDuel(Player $player, int $type, Kit $kit = null, $checkOs = false) {
+		$type = $this->getDuelType($type);
+
+		if($type === null) {
+			$player->sendTip(TF::GOLD . "Uh oh, looks like something went wrong! Try again!");
+			return null;
+		}
+
 		foreach($this->duels as $duel) {
 			if($duel->isJoinable()) {
-				if($duel->getType() === $type) {
+				if($duel->getType()->getId() === $type->getId()) {
 					if($checkOs and !$duel->matchesOs($player->getDeviceOS())) continue;
 					if($kit instanceof Kit and $kit->getName() != $duel->getKit()->getName()) continue;
 					$duel->addPlayer($player);
@@ -53,7 +113,7 @@ class DuelManager {
 			$this->addDuel($type, $kit, $player->getDeviceOS());
 			foreach($this->duels as $duel) {
 				if($duel->isJoinable()) {
-					if($duel->getType() === $type) {
+					if($duel->getType()->getId() === $type->getId()) {
 						if($checkOs and !$duel->matchesOs($player->getDeviceOS())) continue;
 						if($kit instanceof Kit and $kit->getName() != $duel->getKit()->getName()) continue;
 						$duel->addPlayer($player);

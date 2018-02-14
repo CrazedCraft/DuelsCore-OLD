@@ -43,16 +43,16 @@ class DuelCountdown extends PluginTask {
 						$this->waitTime--;
 					} else {
 						//$this->duel->getBossBar()->setText(TF::GRAY . "Waiting for players...");
-						$this->duel->broadcastTip(TF::LIGHT_PURPLE . "Waiting for players (" . TF::GREEN . count($this->duel->getPlayers()) . TF::LIGHT_PURPLE . "/" . TF::GREEN . ($this->duel->getType() === Duel::TYPE_1V1 ? "2" : "4") . TF::LIGHT_PURPLE . ")");
+						$this->duel->broadcastTip(TF::LIGHT_PURPLE . "Waiting for players (" . TF::GREEN . count($this->duel->getPlayers()) . TF::LIGHT_PURPLE . "/" . TF::GREEN . $this->duel->getType()->getMaxPlayers() . TF::LIGHT_PURPLE . ")");
 					}
 				} else {
 					$this->duel->start();
 				}
 			} elseif($this->duelTime >= 0) {
-				if(($this->duel->getType() === Duel::TYPE_1V1 or $this->duel->getType() === Duel::TYPE_FFA) and count($this->duel->players) <= 1) {
+				if(($this->duel->getType()->getId() === DuelType::DUEL_TYPE_1V1 or $this->duel->getType()->getId() === DuelType::DUEL_TYPE_FFA) and count($this->duel->players) <= 1) {
 					$this->duel->end();
 					return;
-				} elseif($this->duel->getType() === Duel::TYPE_2V2) {
+				} elseif($this->duel->getType()->getId() === DuelType::DUEL_TYPE_2v2) {
 					foreach($this->duel->teams as $team) {
 						$count = 0;
 						foreach($team as $key => $player) {

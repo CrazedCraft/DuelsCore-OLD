@@ -14,10 +14,9 @@
  *
  */
 
-namespace duels\ui\elements;
+namespace duels\ui\elements\play;
 
 use core\CorePlayer;
-use duels\duel\Duel;
 use duels\kit\Kit;
 use duels\Main;
 use duels\session\PlayerSession;
@@ -42,7 +41,7 @@ class PlayKitSelectionButton extends KitSelectionButton {
 				if($session->inParty() and !$session->getParty()->isOwner($player)) {
 					$player->sendMessage(TF::RED . "Only the party leader can join a duel!");
 				} else {
-					Main::getInstance()->getDuelManager()->findDuel($player, Duel::TYPE_1V1, $this->getKit()->getType() === Kit::TYPE_RANDOM ? null : $this->getKit(), true);
+					Main::getInstance()->getDuelManager()->findDuel($player, $session->lastSelectedPlayType, $this->getKit()->getType() === Kit::TYPE_RANDOM ? null : $this->getKit(), true);
 				}
 			} else {
 				$player->sendMessage(TF::RED . "You're already in a duel!");

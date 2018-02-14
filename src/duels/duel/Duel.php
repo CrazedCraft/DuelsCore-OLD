@@ -13,19 +13,20 @@ use pocketmine\Player;
 use pocketmine\utils\TextFormat as TF;
 
 class Duel {
-
-	const TYPE_1V1 = "1v1";
-	const TYPE_2V2 = "2v2";
-	const TYPE_FFA = "FFA";
 	const STATUS_WAITING = 0;
 	const STATUS_PLAYING = 1;
+
 	const OS_MOBILE = "mobile";
 	const OS_WINDOWS = "windows";
+
 	public $players = [];
 	public $kit = null;
 	public $winner;
 	private $plugin;
-	private $type = self::TYPE_1V1;
+
+	/** @var DuelType */
+	private $type;
+
 	private $status;
 	private $arena;
 	private $countdown = null;
@@ -37,7 +38,7 @@ class Duel {
 
 	private $os = self::OS_MOBILE;
 
-	public function __construct(Main $plugin, $type, Arena $arena, Kit $kit) {
+	public function __construct(Main $plugin, DuelType $type, Arena $arena, Kit $kit) {
 		$this->plugin = $plugin;
 		$this->type = $type;
 		$this->arena = $arena;
@@ -56,7 +57,7 @@ class Duel {
 		return $this->ended;
 	}
 
-	public function getType() {
+	public function getType() : DuelType {
 		return $this->type;
 	}
 
@@ -77,10 +78,9 @@ class Duel {
 					unset($this->players[$name]);
 					continue;
 				}
-				if($this->type === self::TYPE_1V1 or $this->type === self::TYPE_FFA) {
+				if($this->type->getId() === DuelType::DUEL_TYPE_1V1 or $this->type->getId() === DuelType::DUEL_TYPE_FFA) {
 					$p->sendMessage(TF::BOLD . TF::AQUA . $this->winner["player"] . TF::RESET . TF::GREEN . " won with " . TF::RED . $this->winner["val"] / 2 . " <3's " . TF::GREEN . "left!");
-				}
-				elseif($this->type === self::TYPE_2V2) {
+				} elseif($this->type->getId() === DuelType::DUEL_TYPE_2v2) {
 					$session = $this->plugin->sessionManager->get($p->getName());
 					if($session instanceof PlayerSession) {
 						$winningTeam = ($session->getTeam() === "0" ? TF::GOLD . "Orange" : TF::DARK_PURPLE . "Purple");
@@ -171,7 +171,7 @@ class Duel {
 				if(!$this->kit instanceof Kit) {
 					$this->kit = $this->plugin->kitManager->getRandomKit();
 				}
-				if($this->type === Duel::TYPE_2V2) {
+				if($this->type->getId() === DuelType::DUEL_TYPE_2v2) {
 					if($session->getTeam() === "0")
 						$p->setNameTag(TF::GOLD . $p->getName());
 					if($session->getTeam() === "1")
@@ -179,13 +179,13 @@ class Duel {
 				} else {
 					$p->setNameTag(TF::RED . $p->getName());
 				}
-				if($this->type === self::TYPE_1V1) {
+				if($this->type->getId() === DuelType::DUEL_TYPE_1V1) {
 					$p->sendMessage(TF::GREEN . "Duel against " . TF::BOLD . TF::GOLD . array_rand($this->teams[($session->getTeam() === "0" ? "1" : "0")]) . TF::GREEN . "!");
-				} elseif($this->type === self::TYPE_2V2) {
+				} elseif($this->type->getId() === DuelType::DUEL_TYPE_2v2) {
 					$teammate = $t;
 					unset($teammate[$p->getName()]);
 					$p->sendMessage(TF::GREEN . "You're on " . TF::BOLD . ($session->getTeam() === "0" ? TF::GOLD . "orange" : TF::DARK_PURPLE . "purple") . TF::RESET . TF::GREEN . " team with " . TF::BOLD . TF::AQUA . array_rand($teammate));
-				} elseif($this->type === self::TYPE_FFA) {
+				} elseif($this->type->getId() === DuelType::DUEL_TYPE_FFA) {
 					$p->sendMessage(TF::GREEN . "FFA duel against " . TF::BOLD . TF::GOLD . implode(TF::RESET . TF::GRAY . ", " . TF::BOLD . TF::GOLD, array_keys($this->players)) . TF::GREEN . "!");
 				}
 				$p->despawnFromAll();
@@ -236,14 +236,8 @@ class Duel {
 
 	public function isJoinable() {
 		if($this->status !== self::STATUS_WAITING) return;
-		if($this->type === self::TYPE_1V1) {
-			return !(count($this->players) >= 2);
-		} elseif($this->type === self::TYPE_2V2) {
-			return !(count($this->players) >= 4);
-		} elseif($this->type === self::TYPE_FFA) {
-			return false;
-		}
-		return false;
+
+		return count($this->players) < $this->type->getMinPlayers();
 	}
 
 	public function getPlayers() {
@@ -268,7 +262,7 @@ class Duel {
 		$player->sendMessage(TF::YELLOW . "You have joined the queue for " . $this->kit->getDisplayName() . TF::RESET . TF::YELLOW . " kit");
 		$player->getInventory()->clearAll();
 		$player->setHealth(20);
-		if($this->type === self::TYPE_1V1) {
+		if($this->type->getId() === DuelType::DUEL_TYPE_1V1) {
 			if(count($this->teams["0"]) < 1) {
 				$this->teams["0"][$player->getName()] = $player;
 				return $session->setTeam("0");
@@ -276,7 +270,7 @@ class Duel {
 				$this->teams["1"][$player->getName()] = $player;
 				return $session->setTeam("1");
 			}
-		} elseif($this->type === self::TYPE_2V2) {
+		} elseif($this->type->getId() === DuelType::DUEL_TYPE_2v2) {
 			if(count($this->teams["0"]) < 2) {
 				$this->teams["0"][$player->getName()] = $player;
 				return $session->setTeam("0");
@@ -284,7 +278,7 @@ class Duel {
 				$this->teams["1"][$player->getName()] = $player;
 				return $session->setTeam("1");
 			}
-		} elseif($this->type === self::TYPE_FFA) {
+		} elseif($this->type->getId() === DuelType::DUEL_TYPE_FFA) {
 			if(count($this->teams["0"]) < count($this->teams["1"])) {
 				$this->teams["0"][$player->getName()] = $player;
 				return $session->setTeam("0");
@@ -330,10 +324,10 @@ class Duel {
 		$session->removeDuel();
 		$victim->setNameTag(TF::YELLOW . TF::clean($victim->getName()));
 		if($victim instanceof Player and $victim->isOnline()) $this->plugin->giveLobbyItems($victim);;
-		if($this->type === self::TYPE_1V1) {
+		if($this->type->getId() === DuelType::DUEL_TYPE_1V1) {
 			$this->removePlayer($victim->getName());
 			$this->end();
-		} elseif($this->type === self::TYPE_2V2) {
+		} elseif($this->type->getId() === DuelType::DUEL_TYPE_2v2) {
 			unset($this->players[$victim->getName()]);
 			foreach($this->teams as $key => $t) {
 				unset($this->teams[$key][$victim->getName()]);
@@ -343,7 +337,7 @@ class Duel {
 					break;
 				}
 			}
-		} elseif($this->type === self::TYPE_FFA) {
+		} elseif($this->type->getId() === DuelType::DUEL_TYPE_FFA) {
 			$this->removePlayer($victim->getName());
 			if(count($this->players) <= 1) {
 				$this->end();

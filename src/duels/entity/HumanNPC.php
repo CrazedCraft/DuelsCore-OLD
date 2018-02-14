@@ -7,6 +7,7 @@ use core\language\LanguageUtils;
 use core\Utils;
 use duels\arena\Arena;
 use duels\duel\Duel;
+use duels\duel\DuelType;
 use duels\Main;
 use duels\session\PlayerSession;
 use pocketmine\entity\Human;
@@ -22,11 +23,24 @@ class HumanNPC extends Human {
 
 	public $defaultYaw = 180;
 	public $defaultPitch = 0;
+
+	/** @var DuelType */
 	private $type = "";
+
 	private $customName = "Duels";
 	protected $hasReset = [];
 
-	public function getType() {
+	/**
+	 * @param DuelType $type
+	 */
+	public function setType(DuelType $type) {
+		$this->type = $type;
+	}
+
+	/**
+	 * @return DuelType
+	 */
+	public function getType() : DuelType{
 		return $this->type;
 	}
 
@@ -120,9 +134,6 @@ class HumanNPC extends Human {
 		if(isset($this->namedtag->customName) and $this->namedtag->customName instanceof StringTag) {
 			$this->customName = $this->namedtag["customName"];
 		}
-		if(isset($this->namedtag->Type) and $this->namedtag->Type instanceof StringTag) {
-			$this->type = $this->namedtag["Type"];
-		}
 	}
 
 	public function isReset(Player $player) {
@@ -139,7 +150,7 @@ class HumanNPC extends Human {
 					if(!$session->inDuel()) {
 						if($session->inParty()) {
 							if($session->getParty()->isOwner($attacker)) {
-								if($this->getType() === Duel::TYPE_1V1) {
+								if($this->getType()->getId() === DuelType::DUEL_TYPE_1V1) {
 									if(count($session->getParty()->getPlayers()) === 2) {
 										$players = [];
 										foreach($session->getParty()->getPlayers() as $name => $uid) {
@@ -159,7 +170,7 @@ class HumanNPC extends Human {
 											return;
 										}
 										$plugin->arenaManager->remove($arena->getId());
-										$duel = new Duel($plugin, Duel::TYPE_1V1, $arena, $plugin->getKitManager()->getRandomKit());
+										$duel = new Duel($plugin, $this->type, $arena, $plugin->getKitManager()->getRandomKit());
 										$session->lastSelectedKit = null;
 										foreach($players as $p) {
 											$duel->addPlayer($p);
@@ -168,7 +179,7 @@ class HumanNPC extends Human {
 									} else {
 										$attacker->sendPopup(TF::GOLD . "You can only play 1v1's in a party that has two players!");
 									}
-								} elseif($this->getType() === Duel::TYPE_2V2) {
+								} elseif($this->getType()->getId() === DuelType::DUEL_TYPE_2v2) {
 									if(count($session->getParty()->getPlayers()) === 4) {
 										$players = [];
 										foreach($session->getParty()->getPlayers() as $name => $uid) {
@@ -188,7 +199,7 @@ class HumanNPC extends Human {
 											return;
 										}
 										$plugin->arenaManager->remove($arena->getId());
-										$duel = new Duel($plugin, Duel::TYPE_2V2, $arena, $plugin->getKitManager()->getRandomKit());
+										$duel = new Duel($plugin, $this->type, $arena, $plugin->getKitManager()->getRandomKit());
 										$session->lastSelectedKit = null;
 										foreach($players as $p) {
 											$duel->addPlayer($p);
@@ -204,7 +215,7 @@ class HumanNPC extends Human {
 								$attacker->sendMessage(TF::RED . "Only the party leader can join a duel!");
 							}
 						} else {
-							$plugin->duelManager->findDuel($attacker, $this->getType(), null, true);
+							$plugin->duelManager->findDuel($attacker, $this->type->getId(), null, true);
 						}
 					} else {
 						$attacker->sendPopup(TF::RED . "You're already in a duel!");
