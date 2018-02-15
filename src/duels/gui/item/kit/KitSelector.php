@@ -15,7 +15,9 @@ use core\language\LanguageUtils;
 use duels\gui\containers\play\PlayDuelTypeSelectionContainer;
 use duels\Main;
 use duels\session\PlayerSession;
+use duels\ui\windows\play\PlayDuelTypeSelectionForm;
 use pocketmine\item\Item;
+use pocketmine\network\protocol\Info;
 use pocketmine\utils\TextFormat as TF;
 
 class KitSelector extends GUIItem {

@@ -74,8 +74,8 @@ class DuelManager {
 		return $this->duels;
 	}
 
-	public function isDuel($id) {
-		return isset($this->duels[$id]);
+	public function isDuel(int $id) {
+		return isset($this->duels[$id]) and $this->duels[$id] instanceof Duel;
 	}
 
 	public function removeDuel($id) {
@@ -83,8 +83,12 @@ class DuelManager {
 		unset($this->duels[$id]);
 	}
 
-	public function getDuel($id) {
-		return isset($this->duels[$id]) and $this->duels[$id] instanceof Duel;
+	public function getDuel(int $id) : ?Duel {
+		if($this->isDuel($id)) {
+			return $this->duels[$id];
+		}
+
+		return null;
 	}
 
 	public function findDuel(Player $player, int $type, Kit $kit = null, $checkOs = false) {
