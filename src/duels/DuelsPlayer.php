@@ -25,7 +25,6 @@ use duels\duel\DuelType;
 use duels\duel\request\DuelRequestState;
 use duels\kit\Kit;
 use duels\party\Party;
-use duels\session\PlayerSession;
 use pocketmine\event\entity\EntityDamageEvent;
 use pocketmine\utils\TextFormat as TF;
 
@@ -73,6 +72,15 @@ class DuelsPlayer extends CorePlayer {
 	}
 
 	/**
+	 * Check if the player has a last tapped player
+	 *
+	 * @return bool
+	 */
+	public function hasLastTappedPlayer() : bool {
+		return $this->lastTappedPlayerUuid !== null;
+	}
+
+	/**
 	 * Get the last selected duel type id
 	 *
 	 * @return int|null
@@ -91,6 +99,15 @@ class DuelsPlayer extends CorePlayer {
 	}
 
 	/**
+	 * Check if the player has a last selected duel type
+	 *
+	 * @return bool
+	 */
+	public function hasLastSelectedDuelType() : bool {
+		return $this->lastSelectedDuelTypeId !== null;
+	}
+
+	/**
 	 * Get the last selected kits name
 	 *
 	 * @return null|string
@@ -106,6 +123,15 @@ class DuelsPlayer extends CorePlayer {
 	 */
 	public function getLastSelectedKit() : ?Kit {
 		return Main::getInstance()->getKitManager()->getKit($this->lastSelectedKitName ?? null);
+	}
+
+	/**
+	 * Check if the player has a last selected kit
+	 *
+	 * @return bool
+	 */
+	public function hasLastSelectedKit() : bool {
+		return $this->lastSelectedKitName !== null;
 	}
 
 	/**
@@ -165,6 +191,15 @@ class DuelsPlayer extends CorePlayer {
 	}
 
 	/**
+	 * Check if the player has a duel
+	 *
+	 * @return bool
+	 */
+	public function hasDuel() : bool {
+		return $this->duelId !== null;
+	}
+
+	/**
 	 * Get the current party id
 	 *
 	 * @return string|null
@@ -180,6 +215,15 @@ class DuelsPlayer extends CorePlayer {
 	 */
 	public function getParty() {
 		return Main::getInstance()->getPartyManager()->getParty($this->partyId ?? "");
+	}
+
+	/**
+	 * Check if the player has a party
+	 *
+	 * @return bool
+	 */
+	public function hasParty() : bool {
+		return $this->partyId !== null;
 	}
 
 	/**
@@ -295,14 +339,11 @@ class DuelsPlayer extends CorePlayer {
 	}
 
 	public function kill($forReal = false) {
-		$plugin = Main::getInstance();
-		$session = $plugin->getSessionManager()->get($this->getName());
-		if($session instanceof PlayerSession) {
-			if($session->inDuel() and $session->getStatus() === PlayerSession::STATUS_PLAYING and $this->getState() === CorePlayer::STATE_PLAYING) {
-				$session->getDuel()->broadcast(TF::BOLD . TF::AQUA . $this->getName() . TF::RESET . TF::YELLOW . " was killed!");
-				$session->getDuel()->handleDeath($this);
-				return;
-			}
+		if($this->hasDuel() and $this->getState() === CorePlayer::STATE_PLAYING) {
+			$duel = $this->getDuel();
+			$duel->broadcast(TF::BOLD . TF::AQUA . $this->getName() . TF::RESET . TF::YELLOW . " was killed!");
+			$duel->handleDeath($this);
+			return;
 		}
 
 		parent::kill($forReal);

@@ -24,8 +24,6 @@ use duels\gui\item\kit\KitSelector;
 use duels\kit\KitManager;
 use duels\npc\NPCManager;
 use duels\party\PartyManager;
-use duels\session\SessionManager;
-use duels\tasks\SessionCleanupTask;
 use duels\tasks\UpdateInfoTextTask;
 use duels\ui\windows\play\PlayDuelTypeSelectionForm;
 use duels\ui\windows\play\PlayKitSelectionForm;
@@ -52,9 +50,6 @@ class Main extends PluginBase {
 	/** @var EventListener */
 	public $listener;
 
-	/** @var SessionManager */
-	public $sessionManager;
-
 	/** @var ArenaManager */
 	public $arenaManager;
 
@@ -69,10 +64,6 @@ class Main extends PluginBase {
 
 	/** @var PartyManager */
 	public $partyManager;
-
-	/** @var SessionCleanupTask */
-	protected $sessionCleanup;
-
 	/** @var int */
 	public $toRestart = 60 * 60;
 
@@ -119,7 +110,6 @@ class Main extends PluginBase {
 		Main::$spawnCoords = new Vector3(0.5, 93, 0.5);
 		$this->setLobbyItems();
 		$this->loadConfigs();
-		$this->setSessionManager();
 		$this->setArenaManager();
 		$this->setDuelManager();
 		$this->setNPCManager();
@@ -133,7 +123,6 @@ class Main extends PluginBase {
 		$this->getCommand("duel")->setExecutor(new DuelCommand($this));
 		$this->getCommand("hub")->setExecutor(new HubCommand($this));
 		$this->getCommand("party")->setExecutor(new PartyCommand($this));
-		$this->sessionCleanup = new SessionCleanupTask($this);
 		$this->spawnInfoText();
 	}
 
@@ -180,17 +169,7 @@ class Main extends PluginBase {
 	public function onDisable() {
 		$this->duelManager->close();
 		$this->partyManager->close();
-		$this->sessionManager->close();
 		unset($this->sessionManager, $this->arenaManager, $this->npcManager, $this->duelManager);
-	}
-
-	public function getSessionManager() {
-		return $this->sessionManager;
-	}
-
-	public function setSessionManager() {
-		if(isset($this->sessionManager) and $this->sessionManager instanceof SessionManager) return;
-		$this->sessionManager = new SessionManager($this);
 	}
 
 	public function getArenaManager() {

@@ -4,12 +4,13 @@ namespace duels\duel;
 
 use core\CorePlayer;
 use core\entity\BossBar;
+use core\game\team\TeamColors;
+use core\Utils;
 use duels\arena\Arena;
+use duels\DuelsPlayer;
 use duels\kit\Kit;
 use duels\Main;
-use duels\session\PlayerSession;
 use pocketmine\inventory\PlayerInventory;
-use pocketmine\item\fuel\FuelItem;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat as TF;
 
@@ -20,8 +21,12 @@ class Duel {
 	const OS_MOBILE = "mobile";
 	const OS_WINDOWS = "windows";
 
+	/** @var string[] */
 	public $players = [];
+
+	/** @var Kit|null */
 	public $kit = null;
+
 	public $winner;
 	private $plugin;
 
@@ -35,6 +40,8 @@ class Duel {
 	private $countdown = null;
 
 	private $ended = false;
+
+	/** @var Team[] */
 	public $teams = [];
 
 	/** @var BossBar */
@@ -48,8 +55,16 @@ class Duel {
 		$this->arena = $arena;
 		$this->countdown = new DuelCountdown($this->plugin, $this);
 		$this->status = self::STATUS_WAITING;
-		$this->teams = [[], []];
-		$this->kit = $kit;
+		$this->teams = [
+			TeamColors::TEAM_ORANGE => new Team($this, "Gold", TeamColors::TEAM_ORANGE, TF::GOLD),
+			TeamColors::TEAM_PURPLE => new Team($this, "Purple", TeamColors::TEAM_PURPLE, TF::DARK_PURPLE),
+		];
+
+		if($kit->getType() === Kit::TYPE_RANDOM) {
+			$this->kit = $this->kit->getManager()->getRandomKit();
+		} else {
+			$this->kit = $kit;
+		}
 		//$this->bossBar = new BossBar();
 	}
 
@@ -77,20 +92,41 @@ class Duel {
 				$this->getWinner();
 			}
 			// $winner = $this->getWinner();
-			foreach($this->players as $name => $p) {
-				if(!$p instanceof Player) {
+			foreach($this->players as $name => $uuid) {
+				$p = Utils::getPlayerByUUID($uuid);
+				if(!$p instanceof DuelsPlayer) {
 					unset($this->players[$name]);
 					continue;
 				}
 				if($this->type->getId() === DuelType::DUEL_TYPE_1V1 or $this->type->getId() === DuelType::DUEL_TYPE_FFA) {
 					$p->sendMessage(TF::BOLD . TF::AQUA . $this->winner["player"] . TF::RESET . TF::GREEN . " won with " . TF::RED . $this->winner["val"] / 2 . " <3's " . TF::GREEN . "left!");
 				} elseif($this->type->getId() === DuelType::DUEL_TYPE_2v2) {
-					$session = $this->plugin->sessionManager->get($p->getName());
-					if($session instanceof PlayerSession) {
-						$winningTeam = ($session->getTeam() === "0" ? TF::GOLD . "Orange" : TF::DARK_PURPLE . "Purple");
-						$p->sendMessage(TF::BOLD . $winningTeam . TF::RESET . TF::GOLD . " team won the duel!");
-						$p->sendMessage(TF::GREEN . "Winning kill by " . TF::BOLD . TF::AQUA . $this->winner["player"] . TF::RESET . TF::GREEN . " with " . TF::RED . $this->winner["val"] / 2 . " <3's " . TF::GREEN . "left!");
+					$winningTeam = null;
+					foreach($this->teams as $team) {
+						if($winningTeam instanceof Team) {
+							if($team->getPlayerCount() > $winningTeam->getPlayerCount()) { // current team has more players
+								$winningTeam = $team;
+							} elseif($team->getPlayerCount() === $winningTeam->getPlayerCount()) { // decide winners from total health
+								$health = 0;
+								foreach($team->getPlayers() as $p) {
+									$health += $p->getHealth();
+								}
+
+								$winningHealth = 0;
+								foreach($winningTeam->getPlayers() as $p) {
+									$winningHealth += $p->getHealth();
+								}
+
+								if($health > $winningHealth) {
+									$winningTeam = $team;
+								}
+							}
+						} else {
+							$winningTeam = $team;
+						}
 					}
+					$p->sendMessage(TF::BOLD . $winningTeam->getName() . TF::RESET . TF::GOLD . " team won the duel!");
+					$p->sendMessage(TF::GREEN . "Winning kill by " . TF::BOLD . TF::AQUA . $this->winner["player"] . TF::RESET . TF::GREEN . " with " . TF::RED . $this->winner["val"] / 2 . " <3's " . TF::GREEN . "left!");
 				}
 				//$this->bossBar->despawnFrom($p);
 				$p->setStatus("state.lobby");
@@ -106,10 +142,9 @@ class Duel {
 					$p->getInventory()->clearAll();
 					$p->getInventory()->sendArmorContents($p);
 				}
-				$session = $this->plugin->sessionManager->get($p->getName());
 				$p->setNameTag(TF::YELLOW . TF::clean($p->getName()));
-				if($session instanceof PlayerSession) $session->removeDuel();
-				if($p instanceof Player and $p->isOnline()) $this->plugin->giveLobbyItems($p);
+				$p->removeDuel();
+				if($p->isOnline()) $this->plugin->giveLobbyItems($p);
 			}
 			unset($this->type);
 			unset($this->status);
@@ -121,7 +156,8 @@ class Duel {
 	public function getWinner() {
 		$highest = 0;
 		$winner = null;
-		foreach($this->players as $p) {
+		foreach($this->players as $uuid) {
+			$p = Utils::getPlayerByUUID($uuid);
 			if($p->getHealth() > $highest) {
 				$winner = $p;
 				$highest = $p->getHealth();
@@ -163,40 +199,33 @@ class Duel {
 
 	public function countdown() {
 		$this->teleportPlayers();
-		foreach($this->teams as $key => $t) {
-			/** @var Player $p */
-			foreach($t as $p) {
-				$session = $this->plugin->getSessionManager()->get($p->getName());
-				if(!$session instanceof PlayerSession) {
-					$this->removePlayer($p->getName());
+		foreach($this->teams as $team) {
+			foreach($team->getPlayers() as $name => $p) {
+				if(!$p instanceof DuelsPlayer) {
+					$this->removePlayer($name);
 					continue;
 				}
-				$session->setStatus(PlayerSession::STATUS_COUNTDOWN);
-				if(!$this->kit instanceof Kit) {
-					$this->kit = $this->plugin->kitManager->getRandomKit();
-				}
+				$p->setStatus(CorePlayer::STATE_PLAYING);
+
 				if($this->type->getId() === DuelType::DUEL_TYPE_2v2) {
-					if($session->getTeam() === "0")
-						$p->setNameTag(TF::GOLD . $p->getName());
-					if($session->getTeam() === "1")
-						$p->setNameTag(TF::DARK_PURPLE . $p->getName());
+					$p->setNameTag($team->getChatColor() . $p->getName());
 				} else {
 					$p->setNameTag(TF::RED . $p->getName());
 				}
+
 				if($this->type->getId() === DuelType::DUEL_TYPE_1V1) {
-					$p->sendMessage(TF::GREEN . "Duel against " . TF::BOLD . TF::GOLD . array_rand($this->teams[($session->getTeam() === "0" ? "1" : "0")]) . TF::GREEN . "!");
+					$players = $this->getPlayers();
+					unset($players[$p->getName()]);
+					$p->sendMessage(TF::GREEN . "Duel against " . TF::BOLD . TF::GOLD . trim(implode(TF::RESET . TF::GRAY . ", " . TF::BOLD . TF::GOLD, array_keys($players)), TF::RESET . TF::GRAY . ", " . TF::BOLD . TF::GOLD) . TF::RESET . TF::GREEN . "!");
 				} elseif($this->type->getId() === DuelType::DUEL_TYPE_2v2) {
-					$teammate = $t;
-					unset($teammate[$p->getName()]);
-					$p->sendMessage(TF::GREEN . "You're on " . TF::BOLD . ($session->getTeam() === "0" ? TF::GOLD . "orange" : TF::DARK_PURPLE . "purple") . TF::RESET . TF::GREEN . " team with " . TF::BOLD . TF::AQUA . array_rand($teammate));
+					$teammates = $team->getPlayers();
+					unset($teammates[$p->getName()]);
+					$p->sendMessage(TF::GREEN . "You're on " . TF::BOLD . $team->getChatColor() . $team->getName() . TF::RESET . TF::GREEN . " team with " . TF::BOLD . TF::AQUA . trim(implode(",", $teammates), ","));
 				} elseif($this->type->getId() === DuelType::DUEL_TYPE_FFA) {
-					$p->sendMessage(TF::GREEN . "FFA duel against " . TF::BOLD . TF::GOLD . implode(TF::RESET . TF::GRAY . ", " . TF::BOLD . TF::GOLD, array_keys($this->players)) . TF::GREEN . "!");
+					$players = $this->getPlayers();
+					unset($players[$p->getName()]);
+					$p->sendMessage(TF::GREEN . "FFA duel against " . TF::BOLD . TF::GOLD . trim(implode(TF::RESET . TF::GRAY . ", " . TF::BOLD . TF::GOLD, array_keys($players)), TF::RESET . TF::GRAY . ", " . TF::BOLD . TF::GOLD) . TF::RESET . TF::GREEN . "!");
 				}
-				$p->despawnFromAll();
-				foreach($this->players as $duelP) {
-					$p->spawnTo($duelP);
-				}
-				$p->getInventory()->sendContents($p);
 			}
 		}
 	}
@@ -206,13 +235,17 @@ class Duel {
 	 */
 	public function teleportPlayers() {
 		$i = 0;
-		foreach($this->teams as $key => $t) {
-			/** @var Player $p */
-			foreach($t as $p) {
-				$p->teleport($p->getLevel()->getSafeSpawn($this->arena->getLocations()[$i]), $p->yaw, $p->pitch);
+		foreach($this->teams as $team) {
+			foreach($team->getPlayers() as $p) {
+				$p->teleport($p->getLevel()->getSafeSpawn($this->arena->getLocations()[$i]));
 				$p->despawnFromAll();
-				foreach($this->players as $duelP) {
-					$p->spawnTo($duelP);
+				foreach($this->players as $uuid) {
+					if($uuid !== $p->getUniqueId()->toString()) {
+						$duelP = Utils::getPlayerByUUID($uuid);
+						if($duelP instanceof DuelsPlayer) {
+							$p->spawnTo($duelP);
+						}
+					}
 				}
 			}
 			$i++;
@@ -221,19 +254,11 @@ class Duel {
 
 	public function start() {
 		$this->teleportPlayers();
-		foreach($this->players as $p) {
-			if($this->kit->getType() === Kit::TYPE_RANDOM) {
-				$this->kit = $this->kit->getManager()->getRandomKit();
-			}
+		foreach($this->players as $uuid) {
+			/** @var DuelsPlayer $p */
+			$p = Utils::getPlayerByUUID($uuid);
 			$this->kit->applyTo($p);
-			foreach($this->players as $opponent) {
-				if($p->getName() === $opponent->getName()) continue;
-				$p->despawnFrom($opponent);
-				$p->spawnTo($opponent);
-				$p->getInventory()->sendContents($opponent);
-			}
 			$p->setFood(20);
-			$this->plugin->sessionManager->get($p->getName())->setStatus(PlayerSession::STATUS_PLAYING);
 		}
 		$this->status = self::STATUS_PLAYING;
 	}
@@ -253,49 +278,91 @@ class Duel {
 		return $this->players;
 	}
 
-	public function addPlayer(CorePlayer $player) {
-		/** @var $session PlayerSession */
-		if(!($session = $this->plugin->sessionManager->get($player->getName())) instanceof PlayerSession) $player->kick(TF::RED . "Invalid session, please rejoin to enjoy duels!", false);
-		if($session->inDuel()) {
-			$duel = $session->getDuel();
+	public function addPlayer(DuelsPlayer $player) {
+		if($player->hasDuel()) {
+			$duel = $player->getDuel();
 			$duel->broadcast(TF::LIGHT_PURPLE . $player->getName() . TF::GOLD . " left the duel!");
 			$duel->handleDeath($player);
 		}
-		$session->setDuel($this);
+		$player->setDuel($this);
 		//$this->plugin->lobbyBossBar->despawnFrom($player);
 		//$this->bossBar->spawnTo($player);
-		$this->players[$player->getName()] = $player;
+		$this->players[$player->getName()] = $player->getUniqueId()->toString();
 		$player->setStatus(CorePlayer::STATE_PLAYING);
-		$session->setStatus(PlayerSession::STATUS_WAITING);
 		$player->sendMessage(TF::YELLOW . "You have joined the queue for " . $this->kit->getDisplayName() . TF::RESET . TF::YELLOW . " kit");
 		$player->getInventory()->clearAll();
 		$player->setHealth(20);
 		if($this->type->getId() === DuelType::DUEL_TYPE_1V1) {
-			if(count($this->teams["0"]) < 1) {
-				$this->teams["0"][$player->getName()] = $player;
-				return $session->setTeam("0");
-			} elseif(count($this->teams["1"]) < 1) {
-				$this->teams["1"][$player->getName()] = $player;
-				return $session->setTeam("1");
+			foreach($this->teams as $team) {
+				if($team->getPlayerCount() < 1) {
+					$team->addPlayer($player);
+					break;
+				}
 			}
 		} elseif($this->type->getId() === DuelType::DUEL_TYPE_2v2) {
-			if(count($this->teams["0"]) < 2) {
-				$this->teams["0"][$player->getName()] = $player;
-				return $session->setTeam("0");
-			} elseif(count($this->teams["1"]) < 2) {
-				$this->teams["1"][$player->getName()] = $player;
-				return $session->setTeam("1");
-			}
-		} elseif($this->type->getId() === DuelType::DUEL_TYPE_FFA) {
-			if(count($this->teams["0"]) < count($this->teams["1"])) {
-				$this->teams["0"][$player->getName()] = $player;
-				return $session->setTeam("0");
-			} else {
-				$this->teams["1"][$player->getName()] = $player;
-				return $session->setTeam("1");
+			foreach($this->teams as $team) {
+				if($team->getPlayerCount() < 2) {
+					$team->addPlayer($player);
+					break;
+				}
 			}
 		}
-		return null;
+	}
+
+	/**
+	 * @param DuelsPlayer[] $players
+	 * @param bool  $group  Should we try and place these players on the same team?
+	 */
+	public function addPlayers(array $players, bool $group = true) {
+		if($group) {
+			foreach($players as $player) {
+				if($player->hasDuel()) {
+					$duel = $player->getDuel();
+					$duel->broadcast(TF::LIGHT_PURPLE . $player->getName() . TF::GOLD . " left the duel!");
+					$duel->handleDeath($player);
+				}
+				$player->setDuel($this);
+				//$this->plugin->lobbyBossBar->despawnFrom($player);
+				//$this->bossBar->spawnTo($player);
+				$this->players[$player->getName()] = $player->getUniqueId()->toString();
+				$player->setStatus(CorePlayer::STATE_PLAYING);
+				$player->sendMessage(TF::YELLOW . "You have joined the queue for " . $this->kit->getDisplayName() . TF::RESET . TF::YELLOW . " kit");
+				$player->getInventory()->clearAll();
+				$player->setHealth(20);
+			}
+
+			if(($count = count($players)) <= 2 ) {
+				foreach($this->teams as $team) {
+					if($count <= (2 - $team->getPlayerCount())) {
+						foreach($players as $p) {
+							$team->addPlayer($p);
+						}
+						return;
+					}
+				}
+			} else {
+				/** @var Team[] $teams */
+				$teams = usort($this->teams, function($a, $b) {
+					assert($a instanceof Team and $b instanceof Team);
+					return ($a->getPlayerCount() < $b->getPlayerCount()) ? -1 : 1;
+				}); // sort teams by the least amount of players
+
+				foreach($teams as $team) {
+					foreach($players as $key => $p) {
+						if($team->getPlayerCount() < 2) {
+							$team->addPlayer($p);
+							unset($players[$key]);
+						}
+					}
+					return;
+				}
+			}
+
+		} else {
+			foreach($players as $p) {
+				$this->addPlayer($p);
+			}
+		}
 	}
 
 	public function removePlayer($name) {
@@ -307,40 +374,41 @@ class Duel {
 	}
 
 	public function broadcast($message) {
-		foreach($this->players as $p) {
+		foreach($this->players as $uuid) {
+			$p = Utils::getPlayerByUUID($uuid);
 			$p->sendMessage($message);
 		}
 	}
 
 	public function broadcastTip($message) {
-		foreach($this->players as $p) {
+		foreach($this->players as $uuid) {
+			$p = Utils::getPlayerByUUID($uuid);
 			$p->sendPopup($message);
 		}
 	}
 
-	public function handleDeath(CorePlayer $victim) {
+	public function handleDeath(DuelsPlayer $victim) {
 		//$this->bossBar->despawnFrom($victim);
 		$victim->removeAllEffects();
 		$victim->setHealth(20);
 		$victim->setFood(20);
-		$victim->getInventory()->sendContents($victim);
-		$victim->getInventory()->sendArmorContents($victim);
 		$victim->extinguish();
 		$victim->teleport(Main::$spawnCoords);
 		if($victim->getInventory() instanceof PlayerInventory) $victim->getInventory()->clearAll();
-		$session = $this->plugin->sessionManager->get($victim->getName());
-		$session->removeDuel();
+		$victim->getInventory()->sendContents($victim);
+		$victim->getInventory()->sendArmorContents($victim);
+		$victim->removeDuel();
 		$victim->setNameTag(TF::YELLOW . TF::clean($victim->getName()));
-		if($victim instanceof Player and $victim->isOnline()) $this->plugin->giveLobbyItems($victim);;
+		if($victim->isOnline()) $this->plugin->giveLobbyItems($victim);;
 		if($this->type->getId() === DuelType::DUEL_TYPE_1V1) {
 			$this->removePlayer($victim->getName());
 			$this->end();
 		} elseif($this->type->getId() === DuelType::DUEL_TYPE_2v2) {
 			unset($this->players[$victim->getName()]);
-			foreach($this->teams as $key => $t) {
-				unset($this->teams[$key][$victim->getName()]);
+			foreach($this->teams as $key => $team) {
+				$team->removePlayer($victim->getName());
 				unset($this->players[$victim->getName()]);
-				if(count($this->teams[$key]) <= 0) {
+				if($team->getPlayerCount() <= 0) {
 					$this->end();
 					break;
 				}

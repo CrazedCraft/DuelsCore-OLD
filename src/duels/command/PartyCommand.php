@@ -19,13 +19,12 @@
 namespace duels\command;
 
 use core\Utils;
+use duels\DuelsPlayer;
 use duels\Main;
 use duels\party\Party;
-use duels\session\PlayerSession;
 use pocketmine\command\Command;
 use pocketmine\command\CommandExecutor;
 use pocketmine\command\CommandSender;
-use pocketmine\Player;
 use pocketmine\utils\TextFormat as TF;
 
 class PartyCommand implements CommandExecutor {
@@ -37,33 +36,25 @@ class PartyCommand implements CommandExecutor {
 	}
 
 	public function onCommand(CommandSender $sender, Command $cmd, $label, array $args) {
-		if($sender instanceof Player) {
+		if($sender instanceof DuelsPlayer) {
 			if(isset($args[0])) {
 				switch(strtolower($args[0])) {
 					case "invite":
 					case "add":
-						/** @var $requester Player */
-						if(($requester = $this->plugin->getServer()->getPlayer($args[1])) instanceof Player) {
+						$requester = $this->plugin->getServer()->getPlayer($args[1]);
+						if($requester instanceof DuelsPlayer) {
 							if($sender->getName() === $requester->getName()) {
 								$sender->sendMessage(TF::RED . "You cannot invite yourself to a party!");
 								return true;
 							}
-							/** @var $sSession PlayerSession */
-							if(!($sSession = $this->plugin->sessionManager->get($sender->getName())) instanceof PlayerSession) {
-								$sender->kick(TF::RED . "Invalid session, rejoin to enjoy duels!");
-								return true;
-							}
-							if($sSession->inParty()) {
-								if($sSession->getParty()->isOwner($sender)) {
-									if($sSession->getParty()->hasInvitation($requester->getName())) {
+							if($sender->hasParty()) {
+								$party = $sender->getParty();
+								if($party->isOwner($sender)) {
+									if($party->hasInvitation($requester->getName())) {
 										$sender->sendMessage(TF::RED . $requester->getName() . " has already been invited to your party!");
 										return true;
 									}
-									/** @var $rSession PlayerSession */
-									if(!($rSession = $this->plugin->sessionManager->get($requester->getName())) instanceof PlayerSession) {
-										$requester->kick(TF::RED . "Invalid session, rejoin to enjoy duels!");
-									}
-									$sSession->getParty()->invitePlayer($requester);
+									$party->invitePlayer($requester);
 									return true;
 								} else {
 									$sender->sendMessage(TF::RED . "Only the party leader can invite players!");
@@ -84,20 +75,17 @@ class PartyCommand implements CommandExecutor {
 					case "accept":
 					case "join":
 						if(isset($args[1])) {
-							/** @var $requester Player */
-							if(($requester = $this->plugin->getServer()->getPlayer($args[1])) instanceof Player) {
+							$requester = $this->plugin->getServer()->getPlayer($args[1]);
+							if($requester instanceof DuelsPlayer) {
 								if($sender->getName() === $requester->getName()) {
 									$sender->sendMessage(TF::RED . "You cannot join your own party party!");
 									return true;
 								}
-								/** @var $rSession PlayerSession */
-								if(!($rSession = $this->plugin->sessionManager->get($requester->getName())) instanceof PlayerSession) {
-									$requester->kick(TF::RED . "Invalid session, rejoin to enjoy duels!");
-									return true;
-								}
-								if($rSession->inParty()) {
-									if($rSession->getParty()->hasInvitation($sender->getName())) {
-										$rSession->getParty()->acceptInvitation($sender);
+
+								if($requester->hasParty()) {
+									$party = $requester->getParty();
+									if($party->hasInvitation($sender->getName())) {
+										$party->acceptInvitation($sender);
 										return true;
 									} else {
 										$sender->sendMessage(TF::RED . $requester->getName() . " has not invited you to their party!");
@@ -118,45 +106,33 @@ class PartyCommand implements CommandExecutor {
 						break;
 					case "leave":
 					case "quit":
-						/** @var $session PlayerSession */
-						if(!($session = $this->plugin->sessionManager->get($sender->getName())) instanceof PlayerSession) {
-							$sender->kick(TF::RED . "Invalid session, rejoin to enjoy duels!");
-							return true;
-						}
-						if($session->inParty()) {
-							if($session->getParty()->isOwner($sender)) {
+						if($sender->hasParty()) {
+							$party = $sender->getParty();
+							if($party->isOwner($sender)) {
 								$sender->sendMessage(TF::RED . "You cannot leave your own party! You must promote another player to leader or disband your party.");
 								return true;
 							}
-							$session->getParty()->removePlayer($sender->getName());
+							$party->removePlayer($sender->getName());
 						} else {
 							$sender->sendMessage(TF::RED . "You must be in a party to use this command!");
 							return true;
 						}
 						break;
 					case "promote":
-						/** @var $session PlayerSession */
-						if(!($session = $this->plugin->sessionManager->get($sender->getName())) instanceof PlayerSession) {
-							$sender->kick(TF::RED . "Invalid session, rejoin to enjoy duels!");
-							return true;
-						}
-						if($session->inParty()) {
-							if($session->getParty()->isOwner($sender)) {
+						if($sender->hasParty()) {
+							$party = $sender->getParty();
+							if($party->isOwner($sender)) {
 								if(isset($args[1])) {
-									/** @var $requester Player */
-									if(($requester = $this->plugin->getServer()->getPlayer($args[1])) instanceof Player) {
+									$requester = $this->plugin->getServer()->getPlayer($args[1]);
+									if($requester instanceof DuelsPlayer) {
 										if($sender->getName() === $requester->getName()) {
 											$sender->sendMessage(TF::RED . "You cannot promote yourself to leader!");
 											return true;
 										}
-										/** @var $rSession PlayerSession */
-										if(!($rSession = $this->plugin->sessionManager->get($requester->getName())) instanceof PlayerSession) {
-											$requester->kick(TF::RED . "Invalid session, rejoin to enjoy duels!");
-											return true;
-										}
-										if($rSession->inParty() and $rSession->getParty()->getId() === $session->getParty()->getId()) {
-											$session->getParty()->setOwner($requester);
-											$sender->sendMessage(TF::GOLD . "- " . TF::GREEN . $requester->getName() . " has been promoted to party leader!");
+
+										if($requester->hasParty() and $requester->getPartyId() === $party->getId()) {
+											$party->setOwner($requester);
+											$party->broadcastMessage(TF::GOLD . "- " . TF::GREEN . $requester->getName() . " has been promoted to party leader!");
 											$requester->sendMessage(TF::GOLD . "- ". TF::GREEN . $sender->getName() . " has promoted you to party leader!");
 											return true;
 										} else {
@@ -180,36 +156,29 @@ class PartyCommand implements CommandExecutor {
 						break;
 					case "kick":
 					case "remove":
-						/** @var $session PlayerSession */
-						if(!($session = $this->plugin->sessionManager->get($sender->getName())) instanceof PlayerSession) {
-							$sender->kick(TF::RED . "Invalid session, rejoin to enjoy duels!");
-							return true;
-						}
-						if($session->inParty()) {
-							if($session->getParty()->isOwner($sender)) {
+						if($sender->hasParty()) {
+							$party = $sender->getParty();
+							if($party->isOwner($sender)) {
 								if(isset($args[1])) {
-									/** @var $requester Player */
-									if(($requester = $this->plugin->getServer()->getPlayer($args[1])) instanceof Player) {
+									$requester = $this->plugin->getServer()->getPlayer($args[1]);
+									if($requester instanceof DuelsPlayer) {
 										if($sender->getName() === $requester->getName()) {
 											$sender->sendMessage(TF::RED . "You cannot kick yourself from your party!!");
 											return true;
 										}
-										/** @var $rSession PlayerSession */
-										if(!($rSession = $this->plugin->sessionManager->get($requester->getName())) instanceof PlayerSession) {
-											$requester->kick(TF::RED . "Invalid session, rejoin to enjoy duels!");
-											return true;
-										}
-										if($rSession->inParty() and $rSession->getParty()->getId() === $session->getParty()->getId()) {
-											$session->getParty()->kickPlayer($requester->getName());
-											$requester->sendMessage(TF::GOLD . "- ". TF::GREEN . $sender->getName() . " has removed you from their party");
+
+										if($requester->hasParty() and $requester->getPartyId() === $party->getId()) {
+											$party->kickPlayer($requester->getName());
+											$requester->sendMessage(TF::GOLD . "- ". TF::GREEN . $requester->getName() . " has removed you from their party");
 											return true;
 										} else {
 											$sender->sendMessage(TF::GOLD . $requester->getName() . TF::RED . " is not in your party!");
 											return true;
 										}
 									} else {
-										if($session->getParty()->inParty($args[1])) {
-											$session->getParty()->kickPlayer($args[1]);
+										if($party->inParty($args[1])) {
+											$party->kickPlayer($args[1]);
+											$requester->sendMessage(TF::GOLD . "- ". TF::GREEN . $args[1] . " has removed you from their party");
 											return true;
 										} else {
 											$sender->sendMessage(TF::GOLD . $args[1] . TF::RED . " is not in your party!");
@@ -230,14 +199,10 @@ class PartyCommand implements CommandExecutor {
 						}
 						break;
 					case "disband":
-						/** @var $session PlayerSession */
-						if(!($session = $this->plugin->sessionManager->get($sender->getName())) instanceof PlayerSession) {
-							$sender->kick(TF::RED . "Invalid session, rejoin to enjoy duels!");
-							return true;
-						}
-						if($session->inParty()) {
-							if($session->getParty()->isOwner($sender)) {
-								$session->getParty()->disband("{$sender->getName()} disbanding the party");
+						if($sender->hasParty()) {
+							$party = $sender->getParty();
+							if($party->isOwner($sender)) {
+								$party->disband("{$sender->getName()} disbanding the party");
 							} else {
 								$sender->sendMessage(TF::RED . "You must be the leader of a party to use this command!");
 								return true;
@@ -248,13 +213,8 @@ class PartyCommand implements CommandExecutor {
 						}
 						break;
 					case "list" :
-						/** @var $session PlayerSession */
-						if(!($session = $this->plugin->sessionManager->get($sender->getName())) instanceof PlayerSession) {
-							$sender->kick(TF::RED . "Invalid session, rejoin to enjoy duels!");
-							return true;
-						}
-						if($session->inParty()) {
-							$session->getParty()->sendList($sender);
+						if($sender->hasParty()) {
+							$sender->getParty()->sendList($sender);
 						} else {
 							$sender->sendMessage(TF::RED . "You must be in a party to use this command!");
 							return true;

@@ -16,36 +16,28 @@
 
 namespace duels\ui\elements\play;
 
-use core\CorePlayer;
+use duels\DuelsPlayer;
 use duels\kit\Kit;
 use duels\Main;
-use duels\session\PlayerSession;
 use duels\ui\elements\generic\KitSelectionButton;
 use pocketmine\utils\TextFormat as TF;
 
 class PlayKitSelectionButton extends KitSelectionButton {
 
 	/**
-	 * Add player to
-	 *
-	 * @param bool $value
-	 * @param CorePlayer $player
+	 * @param bool        $value
+	 * @param DuelsPlayer $player
 	 */
 	public function handle($value, $player) {
-		$plugin = Main::getInstance();
-		/** @var $session PlayerSession */
-		if(!($session = $plugin->sessionManager->get($player->getName())) instanceof PlayerSession) {
-			$player->kick(TF::RED . "Invalid session, rejoin to enjoy duels!");
-		} else {
-			if(!$session->inDuel()) {
-				if($session->inParty() and !$session->getParty()->isOwner($player)) {
-					$player->sendMessage(TF::RED . "Only the party leader can join a duel!");
-				} else {
-					Main::getInstance()->getDuelManager()->findDuel($player, $session->lastSelectedPlayType, $this->getKit()->getType() === Kit::TYPE_RANDOM ? null : $this->getKit(), true);
-				}
+		if(!$player->hasDuel()) {
+			if($player->hasParty() and !$player->getParty()->isOwner($player)) {
+				$player->sendMessage(TF::RED . "Only the party leader can join a duel!");
 			} else {
-				$player->sendMessage(TF::RED . "You're already in a duel!");
+				Main::getInstance()->getDuelManager()->findDuel($player, $player->getLastSelectedDuelTypeId(), $this->getKit()->getType() === Kit::TYPE_RANDOM ? null : $this->getKit(), true);
+				$player->removeLastSelectedDuelType();
 			}
+		} else {
+			$player->sendMessage(TF::RED . "You're already in a duel!");
 		}
 	}
 

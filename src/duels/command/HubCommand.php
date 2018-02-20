@@ -18,12 +18,11 @@
 
 namespace duels\command;
 
+use duels\DuelsPlayer;
 use duels\Main;
-use duels\session\PlayerSession;
 use pocketmine\command\Command;
 use pocketmine\command\CommandExecutor;
 use pocketmine\command\CommandSender;
-use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 
 class HubCommand implements CommandExecutor {
@@ -35,10 +34,9 @@ class HubCommand implements CommandExecutor {
 	}
 
 	public function onCommand(CommandSender $sender, Command $cmd, $label, array $args) {
-		if($sender instanceof Player) {
-			/** @var PlayerSession $session */
-			if(($session = $this->plugin->sessionManager->get($sender->getName()))instanceof PlayerSession and $session->inDuel()) {
-				$duel = $session->getDuel();
+		if($sender instanceof DuelsPlayer) {
+			if($sender->hasDuel()) {
+				$duel = $sender->getDuel();
 				$duel->broadcast(TextFormat::LIGHT_PURPLE . $sender->getName() . TextFormat::GOLD . " left the duel!");
 				$duel->handleDeath($sender);
 			}

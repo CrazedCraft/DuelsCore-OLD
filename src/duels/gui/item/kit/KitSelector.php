@@ -12,9 +12,8 @@ namespace duels\gui\item\kit;
 use core\CorePlayer;
 use core\gui\item\GUIItem;
 use core\language\LanguageUtils;
+use duels\DuelsPlayer;
 use duels\gui\containers\play\PlayDuelTypeSelectionContainer;
-use duels\Main;
-use duels\session\PlayerSession;
 use duels\ui\windows\play\PlayDuelTypeSelectionForm;
 use pocketmine\item\Item;
 use pocketmine\network\protocol\Info;
@@ -30,14 +29,13 @@ class KitSelector extends GUIItem {
 		$this->setPreviewName($this->getName());
 	}
 
+	/**
+	 * @param DuelsPlayer|CorePlayer $player
+	 *
+	 * @return bool|void
+	 */
 	public function onClick(CorePlayer $player) {
-		$plugin = Main::getInstance();
-		/** @var $session PlayerSession */
-		if(!($session = $plugin->sessionManager->get($player->getName())) instanceof PlayerSession) {
-			$player->kick(TF::RED . "Invalid session, rejoin to enjoy duels!");
-			return;
-		}
-		if(!$session->inParty()) {
+		if(!$player->hasParty()) {
 			if($player->getPlayerProtocol() >= Info::PROTOCOL_120) {
 				$player->showModal($player->getCore()->getUIManager()->getForm(PlayDuelTypeSelectionForm::FORM_UI_ID));
 			} else {

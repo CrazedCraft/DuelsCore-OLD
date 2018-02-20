@@ -19,7 +19,10 @@
 namespace duels\party;
 
 use core\CorePlayer;
+use core\language\LanguageUtils;
 use core\Utils;
+use duels\DuelsPlayer;
+use pocketmine\Player;
 use pocketmine\scheduler\PluginTask;
 
 class PartyInvitation extends PluginTask {
@@ -48,7 +51,7 @@ class PartyInvitation extends PluginTask {
 	}
 
 	/**
-	 * @return null|CorePlayer
+	 * @return null|DuelsPlayer|Player
 	 */
 	public function getInvitee() {
 		return $this->party->getManager()->getPlugin()->getServer()->getPlayerExact($this->invitee);
@@ -73,6 +76,11 @@ class PartyInvitation extends PluginTask {
 			$this->accepted = true;
 			$this->party->broadcastMessage(Utils::translateColors("&c- &6Party invitation to {$this->invitee} has expired!"));
 			$this->party->removeInvitation($this->invitee);
+
+			$invitee = $this->getInvitee();
+			if($invitee instanceof DuelsPlayer) {
+				$invitee->sendMessage(LanguageUtils::translateColors("&c- &6Party invitation from {$this->party->getOwner()->getName()} has expired!"));
+			}
 		}
 	}
 

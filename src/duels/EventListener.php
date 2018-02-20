@@ -10,7 +10,6 @@ use duels\duel\DuelType;
 use duels\gui\item\duel\DuelKitRequestSelector;
 use duels\gui\item\kit\KitSelector;
 use duels\kit\Kit;
-use duels\session\PlayerSession;
 use pocketmine\block\Block;
 use pocketmine\event\entity\EntityDamageByEntityEvent;
 use pocketmine\event\entity\EntityDamageEvent;
@@ -51,13 +50,10 @@ class EventListener implements Listener {
 	}
 
 	public function onExhaust(PlayerExhaustEvent $event) {
+		/** @var DuelsPlayer $player */
 		$player = $event->getPlayer();
-		/** @var PlayerSession $session */
-		$session = $this->plugin->sessionManager->get($player->getName());
-		if($session instanceof PlayerSession) {
-			if($session->getStatus() !== PlayerSession::STATUS_PLAYING) {
-				$event->setCancelled(true);
-			}
+		if($player->getState() !== CorePlayer::STATE_PLAYING) {
+			$event->setCancelled(true);
 		}
 	}
 
@@ -70,11 +66,6 @@ class EventListener implements Listener {
 		$event->setJoinMessage("");
 		$player = $event->getPlayer();
 		$player->setFood(20);
-		$session = $this->plugin->sessionManager->get($player->getName());
-		if($session instanceof PlayerSession) {
-			$session->close();
-		}
-		$this->plugin->getSessionManager()->add($player);
 		$player->setNameTag(TF::YELLOW . $player->getName());
 		$this->plugin->giveLobbyItems($player);
 		//$this->plugin->lobbyBossBar->spawnTo($player);
@@ -104,121 +95,111 @@ class EventListener implements Listener {
 
 	public function onDamage(EntityDamageEvent $event) {
 		$victim = $event->getEntity();
-		if($victim instanceof CorePlayer) {
-			$session = $this->plugin->getSessionManager()->get($victim->getName());
-			if($session instanceof PlayerSession) {
-				if($session->inDuel() and $session->getStatus() === PlayerSession::STATUS_PLAYING and $victim->getState() === CorePlayer::STATE_PLAYING) {
-					if($event->getFinalDamage() >= $victim->getHealth()) {
-						$event->setCancelled(true);
-						$cause = $victim->getLastDamageCause();
-						switch($cause === null ? EntityDamageEvent::CAUSE_CUSTOM : $cause->getCause()) {
-							case EntityDamageEvent::CAUSE_ENTITY_ATTACK:
-								if($cause instanceof EntityDamageByEntityEvent) {
-									$damager = $cause->getDamager();
-									if($damager instanceof Player) {
-										$session->getDuel()->winner["val"] = $damager->getHealth();
-										$message = TF::BOLD . TF::GOLD . $damager->getName() . TF::RESET . TF::YELLOW . " killed " . TF::BOLD . TF::AQUA . $victim->getName() . TF::RESET . TF::YELLOW . " with " . TF::RED . $session->getDuel()->winner["val"] / 2 . " <3's " . TF::GREEN . "left!";
-										$session->getDuel()->winner["player"] = $damager->getName();
-									} elseif($damager->getNameTag() !== null or $damager->getNameTag() !== "") {
-										$message = TF::BOLD . TF::AQUA . $victim->getName() . TF::RESET . TF::YELLOW . " was killed by " . TF::BOLD . TF::GOLD . $victim->getName() . TF::RESET . TF::YELLOW . "!";
-									}
+		if($victim instanceof DuelsPlayer) {
+			if($victim->hasDuel()) {
+				$duel = $victim->getDuel();
+				if($event->getFinalDamage() >= $victim->getHealth()) {
+					$event->setCancelled(true);
+					$cause = $victim->getLastDamageCause();
+					switch($cause === null ? EntityDamageEvent::CAUSE_CUSTOM : $cause->getCause()) {
+						case EntityDamageEvent::CAUSE_ENTITY_ATTACK:
+							if($cause instanceof EntityDamageByEntityEvent) {
+								$damager = $cause->getDamager();
+								if($damager instanceof DuelsPlayer) {
+									$duel->winner["val"] = $damager->getHealth();
+									$message = TF::BOLD . TF::GOLD . $damager->getName() . TF::RESET . TF::YELLOW . " killed " . TF::BOLD . TF::AQUA . $victim->getName() . TF::RESET . TF::YELLOW . " with " . TF::RED .$duel->winner["val"] / 2 . " <3's " . TF::GREEN . "left!";
+									$duel->winner["player"] = $damager->getName();
+								} elseif($damager->getNameTag() !== null or $damager->getNameTag() !== "") {
+									$message = TF::BOLD . TF::AQUA . $victim->getName() . TF::RESET . TF::YELLOW . " was killed by " . TF::BOLD . TF::GOLD . $victim->getName() . TF::RESET . TF::YELLOW . "!";
 								}
-								break;
-							case EntityDamageEvent::CAUSE_PROJECTILE:
-								if($cause instanceof EntityDamageByEntityEvent) {
-									$damager = $cause->getDamager();
-									if($damager instanceof Player) {
-										$session->getDuel()->winner["val"] = $damager->getHealth();
-										$message = TF::BOLD . TF::GOLD . $damager->getName() . TF::RESET . TF::YELLOW . " shot " . TF::BOLD . TF::AQUA . $victim->getName() . TF::RESET . TF::YELLOW . " with " . TF::RED . $session->getDuel()->winner["val"] / 2 . " <3's " . TF::GREEN . "left!";
-										$session->getDuel()->winner["player"] = $damager->getName();
-									} elseif($damager->getNameTag() !== null or $damager->getNameTag() !== "") {
-										$message = TF::BOLD . TF::AQUA . $victim->getName() . TF::RESET . TF::YELLOW . " was shot by " . TF::BOLD . TF::GOLD . $victim->getName() . TF::RESET . TF::YELLOW . "!";
-									}
+							}
+							break;
+						case EntityDamageEvent::CAUSE_PROJECTILE:
+							if($cause instanceof EntityDamageByEntityEvent) {
+								$damager = $cause->getDamager();
+								if($damager instanceof DuelsPlayer) {
+									$duel->winner["val"] = $damager->getHealth();
+									$message = TF::BOLD . TF::GOLD . $damager->getName() . TF::RESET . TF::YELLOW . " shot " . TF::BOLD . TF::AQUA . $victim->getName() . TF::RESET . TF::YELLOW . " with " . TF::RED . $duel->winner["val"] / 2 . " <3's " . TF::GREEN . "left!";
+									$duel->winner["player"] = $damager->getName();
+								} elseif($damager->getNameTag() !== null or $damager->getNameTag() !== "") {
+									$message = TF::BOLD . TF::AQUA . $victim->getName() . TF::RESET . TF::YELLOW . " was shot by " . TF::BOLD . TF::GOLD . $victim->getName() . TF::RESET . TF::YELLOW . "!";
 								}
-								break;
-							case EntityDamageEvent::CAUSE_FALL:
-								//$message = TF::BOLD . TF::AQUA . $victim->getName() . TF::RESET . TF::LIGHT_PURPLE . " thought they could soar like an eagle!";
-								return;
-							case EntityDamageEvent::CAUSE_DROWNING:
-								$message = TF::BOLD . TF::AQUA . $victim->getName() . TF::RESET . TF::YELLOW . " thought they were a fish!";
-								break;
-							case EntityDamageEvent::CAUSE_FIRE:
-							case EntityDamageEvent::CAUSE_FIRE_TICK:
-								$message = TF::BOLD . TF::AQUA . $victim->getName() . TF::RESET . TF::GOLD . " was playing with fire!";
-								break;
-							case EntityDamageEvent::CAUSE_LAVA:
-								$message = TF::BOLD . TF::AQUA . $victim->getName() . TF::RESET . TF::RED . " touched the hot stuff, how silly!";
-								break;
-							default:
-								$message = TF::BOLD . TF::AQUA . $victim->getName() . TF::RESET . TF::YELLOW . " was killed!";
-								break;
-						}
-						$session->getDuel()->broadcast($message);
-						$session->getDuel()->handleDeath($victim);
-					} else {
-						if($event->getCause() === EntityDamageEvent::CAUSE_FALL) {
-							$event->setCancelled(true);
+							}
+							break;
+						case EntityDamageEvent::CAUSE_FALL:
+							//$message = TF::BOLD . TF::AQUA . $victim->getName() . TF::RESET . TF::LIGHT_PURPLE . " thought they could soar like an eagle!";
 							return;
+						case EntityDamageEvent::CAUSE_DROWNING:
+							$message = TF::BOLD . TF::AQUA . $victim->getName() . TF::RESET . TF::YELLOW . " thought they were a fish!";
+							break;
+						case EntityDamageEvent::CAUSE_FIRE:
+						case EntityDamageEvent::CAUSE_FIRE_TICK:
+							$message = TF::BOLD . TF::AQUA . $victim->getName() . TF::RESET . TF::GOLD . " was playing with fire!";
+							break;
+						case EntityDamageEvent::CAUSE_LAVA:
+							$message = TF::BOLD . TF::AQUA . $victim->getName() . TF::RESET . TF::RED . " touched the hot stuff, how silly!";
+							break;
+						default:
+							$message = TF::BOLD . TF::AQUA . $victim->getName() . TF::RESET . TF::YELLOW . " was killed!";
+							break;
 						}
+					$victim->getDuel()->broadcast($message);
+					$victim->getDuel()->handleDeath($victim);
+				} else {
+					if($event->getCause() === EntityDamageEvent::CAUSE_FALL) {
+						$event->setCancelled(true);
+						return;
 					}
-				} elseif($event instanceof EntityDamageByEntityEvent) {
-					$target = $event->getEntity();
-					$attacker = $event->getDamager();
-					if($attacker instanceof CorePlayer and $attacker->getState() === CorePlayer::STATE_LOBBY and $target instanceof CorePlayer and $target->getState() === CorePlayer::STATE_LOBBY) {
-						$item = $attacker->getInventory()->getItemInHand();
-						if($item->getId() === Item::STICK and $item instanceof GUIItem) {
-							$aSession = $this->plugin->sessionManager->get($attacker->getName());
-							$tSession = $this->plugin->sessionManager->get($target->getName());
-							if($aSession instanceof PlayerSession and $tSession instanceof PlayerSession) {
-								if(!$aSession->inParty()) {
-									if($aSession->hasRequest($target->getName())) {
-										$aSession->removeRequest($target->getName());
-										$arena = $this->plugin->getArenaManager()->find();
-										if((!$arena instanceof Arena) or isset($this->plugin->duelManager->duels[$arena->getId()])) {
-											$attacker->sendMessage(TF::RED . "Cannot find an open arena!");
-											return false;
-										}
-										$this->plugin->arenaManager->remove($arena->getId());
-										$target->sendMessage(TF::GOLD . TF::BOLD . $attacker->getName() . TF::RESET . TF::GREEN . " has accepted your Duel request!");
-										$attacker->sendMessage(TF::GREEN . "You have accepted a Duel request from " . TF::GOLD . TF::BOLD . $attacker->getName() . TF::RESET . TF::GREEN . "!");
-										$duel = new Duel($this->plugin, $this->plugin->duelManager->getDuelType(DuelType::DUEL_TYPE_1V1), $arena, ($tSession->lastSelectedKit instanceof Kit and $tSession->lastSelectedKit->getType() === Kit::TYPE_KIT) ? $tSession->lastSelectedKit : $this->plugin->getKitManager()->getRandomKit());
-										$tSession->lastSelectedKit = null;
-										$duel->addPlayer($target);
-										$duel->addPlayer($attacker);
-										$this->plugin->duelManager->duels[$arena->getId()] = $duel;
-										return false;
-									} else {
-										if(!$tSession->hasRequest($attacker->getName())) {
-											$aSession->lastTapped = $target;
-											/** @var $handItem GUIItem */
-											$item->handleClick($attacker, true);
-											return false;
-										} else {
-											$attacker->sendMessage(TF::RED . "You've already sent " . TF::GOLD . $target->getName() . TF::RED . " a request!");
-											return false;
-										}
-									}
-								} else {
-									$attacker->sendMessage(TF::RED . "You cannot send or accept duel requests whilst in a party!");
+				}
+			} elseif($event instanceof EntityDamageByEntityEvent) {
+				$target   = $event->getEntity();
+				$attacker = $event->getDamager();
+				if($attacker instanceof DuelsPlayer and $attacker->getState() === CorePlayer::STATE_LOBBY and $target instanceof DuelsPlayer and $target->getState() === CorePlayer::STATE_LOBBY) {
+					$item = $attacker->getInventory()->getItemInHand();
+					if($item->getId() === Item::STICK and $item instanceof GUIItem) {
+						if(!$attacker->hasParty()) {
+							if($attacker->hasDuelRequest($target->getName())) {
+								$attacker->removeRequest($target->getName());
+								$arena = $this->plugin->getArenaManager()->find();
+								if((!$arena instanceof Arena) or isset($this->plugin->duelManager->duels[$arena->getId()])) {
+									$attacker->sendMessage(TF::RED . "Cannot find an open arena!");
+									return false;
 								}
+								$this->plugin->arenaManager->remove($arena->getId());
+								$target->sendMessage(TF::GOLD . TF::BOLD . $attacker->getName() . TF::RESET . TF::GREEN . " has accepted your Duel request!");
+								$attacker->sendMessage(TF::GREEN . "You have accepted a Duel request from " . TF::GOLD . TF::BOLD . $attacker->getName() . TF::RESET . TF::GREEN . "!");
+								$duel                      = new Duel($this->plugin, $this->plugin->duelManager->getDuelType(DuelType::DUEL_TYPE_1V1), $arena, ($tSession->lastSelectedKit instanceof Kit and $tSession->lastSelectedKit->getType() === Kit::TYPE_KIT) ? $tSession->lastSelectedKit : $this->plugin->getKitManager()->getRandomKit());
+								$tSession->lastSelectedKit = null;
+								$duel->addPlayer($target);
+								$duel->addPlayer($attacker);
+								$this->plugin->duelManager->duels[$arena->getId()] = $duel;
+								return false;
 							} else {
-								$event->setCancelled(true);
+								if(!$target->hasRequest($attacker->getName())) {
+									$attacker->setLastTappedPlayer($target);
+									/** @var $handItem GUIItem */
+									$item->handleClick($attacker, true);
+									return false;
+								} else {
+									$attacker->sendMessage(TF::RED . "You've already sent " . TF::GOLD . $target->getName() . TF::RED . " a request!");
+									return false;
+								}
 							}
 						} else {
-							$event->setCancelled(true);
+							$attacker->sendMessage(TF::RED . "You cannot send or accept duel requests whilst in a party!");
 						}
 					} else {
 						$event->setCancelled(true);
 					}
-				} elseif($event->getCause() === EntityDamageEvent::CAUSE_VOID) {
-					$victim->kill();
-					$event->setCancelled(true);
 				} else {
 					$event->setCancelled(true);
 				}
 			} else {
-				$victim->kick("Invalid session");
+				$event->setCancelled(true);
 			}
+		} elseif($event->getCause() === EntityDamageEvent::CAUSE_VOID) {
+			$victim->kill();
+			$event->setCancelled(true);
 		} else {
 			$event->setCancelled(true);
 		}
@@ -227,54 +208,45 @@ class EventListener implements Listener {
 
 	public function onDeath(PlayerDeathEvent $event) {
 		$event->setDeathMessage("");
+		/** @var DuelsPlayer $victim */
 		$victim = $event->getEntity();
 		$event->setDrops([Item::get(0)]);
-		$session = $this->plugin->getSessionManager()->get($victim->getName());
-		if($session instanceof PlayerSession) {
-			if($session->inDuel() and $session->getStatus() === PlayerSession::STATUS_PLAYING) {
-				$session->getDuel()->handleDeath($victim);
-			} else {
-				$victim->teleport(Main::$spawnCoords);
-				$session->removeDuel();
-			}
+		if($victim->hasDuel()) {
+			$victim->getDuel()->handleDeath($victim);
+		} else {
+			$victim->teleport(Main::$spawnCoords);
 		}
 	}
 
 	public function onQuit(PlayerQuitEvent $event) {
 		$event->setQuitMessage("");
+		/** @var DuelsPlayer $player */
 		$player = $event->getPlayer();
 		//$this->plugin->lobbyBossBar->despawnFrom($player);
 		$name = $player->getName();
-		$session = $this->plugin->getSessionManager()->get($name);
-		if($session instanceof PlayerSession) {
-			if($session->inParty()) {
-				$session->getParty()->removePlayer($name);
-			}
-			if($session->inDuel()) {
-				$duel = $session->getDuel();
-				$duel->broadcast(TF::LIGHT_PURPLE . $player->getName() . TF::GOLD . " left the duel!");
-				$duel->removePlayer($player->getName());
-			}
-			$this->plugin->getSessionManager()->remove($name);
+		if($player->hasParty()) {
+			$player->getParty()->removePlayer($name);
+		}
+		if($player->hasDuel()) {
+			$duel = $player->getDuel();
+			$duel->broadcast(TF::LIGHT_PURPLE . $player->getName() . TF::GOLD . " left the duel!");
+			$duel->removePlayer($player->getName());
 		}
 	}
 
 	public function onKick(PlayerKickEvent $event) {
 		$event->setQuitMessage("");
+		/** @var DuelsPlayer $player */
 		$player = $event->getPlayer();
 		//$this->plugin->lobbyBossBar->despawnFrom($player);
 		$name = $player->getName();
-		$session = $this->plugin->sessionManager->get($name);
-		if($session instanceof PlayerSession) {
-			if($session->inParty()) {
-				$session->getParty()->removePlayer($name);
-			}
-			if($session->inDuel()) {
-				$duel = $session->getDuel();
-				$duel->broadcast(TF::LIGHT_PURPLE . $player->getName() . TF::GOLD . " left the duel!");
-				$duel->removePlayer($player->getName());
-			}
-			$this->plugin->getSessionManager()->remove($name);
+		if($player->hasParty()) {
+			$player->getParty()->removePlayer($name);
+		}
+		if($player->hasDuel()) {
+			$duel = $player->getDuel();
+			$duel->broadcast(TF::LIGHT_PURPLE . $player->getName() . TF::GOLD . " left the duel!");
+			$duel->removePlayer($player->getName());
 		}
 	}
 
@@ -284,6 +256,7 @@ class EventListener implements Listener {
 	 * @priority LOWEST
 	 */
 	public function onInteract(PlayerInteractEvent $event) {
+		/** @var DuelsPlayer $player */
 		$player = $event->getPlayer();
 		/** @var Item $slot */
 		$slot = clone $player->getInventory()->getItemInHand();
@@ -303,18 +276,13 @@ class EventListener implements Listener {
 			return;
 		}
 
-		$session = $this->plugin->sessionManager->get($player->getName());
-		if($session instanceof PlayerSession) {
-			if($session->getStatus() !== PlayerSession::STATUS_WAITING) {
-				if($slot->getId() === Item::MUSHROOM_STEW and $player->getHealth() < $player->getMaxHealth()) {
-					$player->setHealth($player->getHealth() + 3);
-					if($player->isSurvival()) {
-						$player->getInventory()->setItemInHand(clone $this->air);
-					}
+		if($player->getState() === CorePlayer::STATE_PLAYING) {
+			if($slot->getId() === Item::MUSHROOM_STEW and $player->getHealth() < $player->getMaxHealth()) {
+				$player->setHealth($player->getHealth() + 3);
+				if($player->isSurvival()) {
+					$player->getInventory()->setItemInHand(clone $this->air);
 				}
 			}
-		} else {
-			$event->setCancelled(true);
 		}
 	}
 
@@ -324,13 +292,11 @@ class EventListener implements Listener {
 
 	public function onLaunch(ProjectileLaunchEvent $event) {
 		$player = $event->getEntity();
-		if(!$player instanceof Player)
+		if(!$player instanceof DuelsPlayer)
 			return;
-		$session = $this->plugin->sessionManager->get($player->getName());
-		if($session instanceof PlayerSession) {
-			if($session->getStatus() !== PlayerSession::STATUS_PLAYING) {
-				$event->setCancelled(true);
-			}
+
+		if($player->getState() === CorePlayer::STATE_PLAYING) {
+			$event->setCancelled(true);
 		}
 	}
 

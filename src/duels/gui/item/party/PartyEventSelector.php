@@ -22,14 +22,9 @@ use core\CorePlayer;
 use core\gui\item\GUIItem;
 use core\language\LanguageUtils;
 use core\Utils;
-use duels\arena\Arena;
-use duels\duel\Duel;
+use duels\DuelsPlayer;
 use duels\gui\containers\PartyEventSelectionContainer;
-use duels\Main;
-use duels\session\PlayerSession;
 use pocketmine\item\Item;
-use pocketmine\Player;
-use pocketmine\utils\TextFormat as TF;
 
 class PartyEventSelector extends GUIItem {
 
@@ -41,16 +36,15 @@ class PartyEventSelector extends GUIItem {
 		$this->setPreviewName($this->getName());
 	}
 
+	/**
+	 * @param DuelsPlayer|CorePlayer $player
+	 *
+	 * @return bool|void
+	 */
 	public function onClick(CorePlayer $player) {
-		$plugin = Main::getInstance();
-		/** @var $session PlayerSession */
-		if(!($session = $plugin->sessionManager->get($player->getName())) instanceof PlayerSession) {
-			$player->kick(TF::RED . "Invalid session, rejoin to enjoy duels!");
-			return;
-		}
-		if(!$session->inDuel()) {
-			if($session->inParty()) {
-				if($session->getParty()->isOwner($player)) {
+		if(!$player->hasDuel()) {
+			if($player->hasParty()) {
+				if($player->getParty()->isOwner($player)) {
 					$player->openGuiContainer($player->getCore()->getGuiManager()->getContainer(PartyEventSelectionContainer::CONTAINER_ID));
 				} else {
 					$player->sendMessage(Utils::translateColors("&cYou must be the party leader to start an event!"));

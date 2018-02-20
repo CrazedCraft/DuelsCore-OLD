@@ -2,14 +2,13 @@
 
 namespace duels\entity;
 
-use core\CorePlayer;
 use core\language\LanguageUtils;
 use core\Utils;
 use duels\arena\Arena;
 use duels\duel\Duel;
 use duels\duel\DuelType;
+use duels\DuelsPlayer;
 use duels\Main;
-use duels\session\PlayerSession;
 use pocketmine\entity\Human;
 use pocketmine\event\entity\EntityDamageByEntityEvent;
 use pocketmine\event\entity\EntityDamageEvent;
@@ -143,87 +142,86 @@ class HumanNPC extends Human {
 	public function attack($damage, EntityDamageEvent $source) {
 		if($source instanceof EntityDamageByEntityEvent) {
 			$attacker = $source->getDamager();
-			if($attacker instanceof CorePlayer) {
+			if($attacker instanceof DuelsPlayer) {
 				$plugin = Main::getInstance();
-				$session = $plugin->getSessionManager()->get($attacker->getName());
-				if($session instanceof PlayerSession) {
-					if(!$session->inDuel()) {
-						if($session->inParty()) {
-							if($session->getParty()->isOwner($attacker)) {
-								if($this->getType()->getId() === DuelType::DUEL_TYPE_1V1) {
-									if(count($session->getParty()->getPlayers()) === 2) {
-										$players = [];
-										foreach($session->getParty()->getPlayers() as $name => $uid) {
-											$attacker = Utils::getPlayerByUUID($uid);
-											if($attacker instanceof Player and $attacker->isOnline()) {
-												$players[] = $attacker;
-												if(count($players) === 2)
-													break;
-											} else {
-												$attacker->sendMessage(TF::RED . "Cannot join duel due to {$name} being offline!");
-												return;
+				if(!$attacker->hasDuel()) {
+					if($attacker->hasParty()) {
+						$party = $attacker->getParty();
+						if($party->isOwner($attacker)) {
+							if($this->getType()->getId() === DuelType::DUEL_TYPE_1V1) {
+								if(count($party->getPlayers()) === 2) {
+									$players = [];
+									foreach($party->getPlayers() as $name => $uid) {
+										$attacker = Utils::getPlayerByUUID($uid);
+										if($attacker instanceof Player and $attacker->isOnline()) {
+											$players[] = $attacker;
+											if(count($players) === 2) {
+												break;
 											}
-										}
-										$arena = $plugin->getArenaManager()->find();
-										if((!$arena instanceof Arena) or isset($this->plugin->duelManager->duels[$arena->getId()])) {
-											$attacker->sendMessage(TF::RED . "Cannot find an open arena!");
+										} else {
+											$attacker->sendMessage(TF::RED . "Cannot join duel due to {$name} being offline!");
 											return;
 										}
-										$plugin->arenaManager->remove($arena->getId());
-										$duel = new Duel($plugin, $this->type, $arena, $plugin->getKitManager()->getRandomKit());
-										$session->lastSelectedKit = null;
-										foreach($players as $p) {
-											$duel->addPlayer($p);
-										}
-										$plugin->duelManager->duels[$arena->getId()] = $duel;
-									} else {
-										$attacker->sendPopup(TF::GOLD . "You can only play 1v1's in a party that has two players!");
 									}
-								} elseif($this->getType()->getId() === DuelType::DUEL_TYPE_2v2) {
-									if(count($session->getParty()->getPlayers()) === 4) {
-										$players = [];
-										foreach($session->getParty()->getPlayers() as $name => $uid) {
-											$attacker = Utils::getPlayerByUUID($uid);
-											if($attacker instanceof Player and $attacker->isOnline()) {
-												$players[] = $attacker;
-												if(count($players) === 4)
-													break;
-											} else {
-												$attacker->sendMessage(TF::RED . "Cannot join duel due to {$name} being offline!");
-												return;
-											}
-										}
-										$arena = $plugin->getArenaManager()->find();
-										if(!($arena instanceof Arena) or isset($this->plugin->duelManager->duels[$arena->getId()])) {
-											$attacker->sendMessage(TF::RED . "Cannot find an open arena!");
-											return;
-										}
-										$plugin->arenaManager->remove($arena->getId());
-										$duel = new Duel($plugin, $this->type, $arena, $plugin->getKitManager()->getRandomKit());
-										$session->lastSelectedKit = null;
-										foreach($players as $p) {
-											$duel->addPlayer($p);
-										}
-										$plugin->duelManager->duels[$arena->getId()] = $duel;
-									} else {
-										$attacker->sendPopup(TF::GOLD . "You can only play 2v2's in a party that has four players!!");
+									$arena = $plugin->getArenaManager()->find();
+									if((!$arena instanceof Arena) or isset($this->plugin->duelManager->duels[$arena->getId()])) {
+										$attacker->sendMessage(TF::RED . "Cannot find an open arena!");
+										return;
 									}
+									$plugin->arenaManager->remove($arena->getId());
+									$duel = new Duel($plugin, $this->type, $arena, $attacker->getLastSelectedKit());
+									$attacker->removeLastSelectedKit();
+									foreach($players as $p) {
+										$duel->addPlayer($p);
+									}
+									$plugin->duelManager->duels[$arena->getId()] = $duel;
 								} else {
-									$attacker->sendPopup(TF::GOLD . "You've managed to break something!");
+									$attacker->sendPopup(TF::GOLD . "You can only play 1v1's in a party that has two players!");
+								}
+							} elseif($this->getType()->getId() === DuelType::DUEL_TYPE_2v2) {
+								if(count($party->getPlayers()) === 4) {
+									$players = [];
+									foreach($party->getPlayers() as $name => $uid) {
+										$attacker = Utils::getPlayerByUUID($uid);
+										if($attacker instanceof Player and $attacker->isOnline()) {
+											$players[] = $attacker;
+											if(count($players) === 4) {
+												break;
+											}
+										} else {
+											$attacker->sendMessage(TF::RED . "Cannot join duel due to {$name} being offline!");
+											return;
+										}
+									}
+									$arena = $plugin->getArenaManager()->find();
+									if(!($arena instanceof Arena) or isset($this->plugin->duelManager->duels[$arena->getId()])) {
+										$attacker->sendMessage(TF::RED . "Cannot find an open arena!");
+										return;
+									}
+									$plugin->arenaManager->remove($arena->getId());
+									$duel = new Duel($plugin, $this->type, $arena, $attacker->getLastSelectedKit());
+									$attacker->removeLastSelectedKit();
+									foreach($players as $p) {
+										$duel->addPlayer($p);
+									}
+									$plugin->duelManager->duels[$arena->getId()] = $duel;
+								} else {
+									$attacker->sendPopup(TF::GOLD . "You can only play 2v2's in a party that has four players!!");
 								}
 							} else {
-								$attacker->sendMessage(TF::RED . "Only the party leader can join a duel!");
+								$attacker->sendPopup(TF::GOLD . "You've managed to break something!");
 							}
 						} else {
-							$plugin->duelManager->findDuel($attacker, $this->type->getId(), null, true);
+							$attacker->sendMessage(TF::RED . "Only the party leader can join a duel!");
 						}
 					} else {
-						$attacker->sendPopup(TF::RED . "You're already in a duel!");
+						$plugin->duelManager->findDuel($attacker, $this->type->getId(), null, true);
 					}
+				} else {
+					$attacker->sendPopup(TF::RED . "You're already in a duel!");
 				}
 			}
 		}
-
 		parent::attack($damage, $source);
 	}
 

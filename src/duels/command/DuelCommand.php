@@ -5,13 +5,12 @@ namespace duels\command;
 use duels\arena\Arena;
 use duels\duel\Duel;
 use duels\duel\DuelType;
+use duels\DuelsPlayer;
 use duels\kit\Kit;
 use duels\Main;
-use duels\session\PlayerSession;
 use pocketmine\command\Command;
 use pocketmine\command\CommandExecutor;
 use pocketmine\command\CommandSender;
-use pocketmine\Player;
 use pocketmine\utils\TextFormat as TF;
 
 class DuelCommand implements CommandExecutor {
@@ -23,24 +22,18 @@ class DuelCommand implements CommandExecutor {
 	}
 
 	public function onCommand(CommandSender $sender, Command $cmd, $label, array $args) {
-		if($sender instanceof Player) {
+		if($sender instanceof DuelsPlayer) {
 			if(isset($args[0])) {
-				if(($requester = $this->plugin->getServer()->getPlayer($args[0])) instanceof Player) {
-					if(!($sSession = $this->plugin->sessionManager->get($sender->getName())) instanceof PlayerSession) {
-						$sender->kick(TF::RED . "Invalid session, rejoin to enjoy duels!", false);
-						return true;
-					}
-					if(!($rSession = $this->plugin->sessionManager->get($requester->getName())) instanceof PlayerSession) {
-						$requester->kick(TF::RED . "Invalid session, rejoin to enjoy duels!", false);
-					}
+				$requester = $this->plugin->getServer()->getPlayer($args[0]);
+				if($requester instanceof DuelsPlayer) {
 					if($sender->getName() === $requester->getName()) {
 						$sender->sendMessage(TF::RED . "You cannot duel yourself!");
-						return;
+						return true;
 					}
-					if($sSession->hasRequest($requester->getName())) {
-						if(!$sSession->inDuel()) {
-							if(!$rSession->inDuel()) {
-								$sSession->removeRequest($requester->getName());
+					if($sender->hasDuelRequest($requester->getName())) {
+						if(!$sender->hasDuel()) {
+							if(!$requester->hasDuel()) {
+								$sender->removeRequest($requester->getName());
 								$arena = $this->plugin->getArenaManager()->find();
 								if((!$arena instanceof Arena) or isset($this->plugin->duelManager->duels[$arena->getId()])) {
 									$sender->sendMessage(TF::RED . "Cannot find an open arena!");
@@ -49,8 +42,10 @@ class DuelCommand implements CommandExecutor {
 								$this->plugin->arenaManager->remove($arena->getId());
 								$requester->sendMessage(TF::GOLD . TF::BOLD . $sender->getName() . TF::RESET . TF::GREEN . " has accepted your Duel request!");
 								$sender->sendMessage(TF::GREEN . "You have accepted a Duel request from " . TF::GOLD . TF::BOLD . $requester->getName() . TF::RESET . TF::GREEN . "!");
-								$duel = new Duel($this->plugin, $this->plugin->duelManager->getDuelType(DuelType::DUEL_TYPE_1V1), $arena, ($rSession->lastSelectedKit instanceof Kit and $rSession->lastSelectedKit->getType() === Kit::TYPE_KIT) ? $rSession->lastSelectedKit : $this->plugin->getKitManager()->getRandomKit());
-								$rSession->lastSelectedKit = null;
+								$kit = $requester->getLastSelectedKit();
+								$duel = new Duel($this->plugin, $this->plugin->duelManager->getDuelType(DuelType::DUEL_TYPE_1V1), $arena, ($kit instanceof Kit and $kit->getType() === Kit::TYPE_KIT) ? $kit : $this->plugin->getKitManager()->getRandomKit());
+								$requester->removeLastSelectedKit();
+								$requester->removeLastTappedPlayer();
 								$duel->addPlayer($sender);
 								$duel->addPlayer($requester);
 								$this->plugin->duelManager->duels[$arena->getId()] = $duel;
@@ -64,8 +59,8 @@ class DuelCommand implements CommandExecutor {
 							return true;
 						}
 					} else {
-						if(!$rSession->hasRequest($sender->getName())) {
-							$rSession->addRequest($sender, $requester);
+						if(!$requester->hasDuelRequest($sender->getName())) {
+							$requester->addRequest($sender, $requester);
 							$sender->sendMessage(TF::AQUA . "Sent a Duel request to " . TF::BOLD . TF::GREEN . $requester->getName() . TF::RESET . TF::AQUA . "!");
 							return true;
 						} else {

@@ -3,7 +3,6 @@
 namespace duels\tasks;
 
 use duels\Main;
-use duels\session\PlayerSession;
 use pocketmine\Player;
 use pocketmine\scheduler\PluginTask;
 use pocketmine\utils\TextFormat as TF;

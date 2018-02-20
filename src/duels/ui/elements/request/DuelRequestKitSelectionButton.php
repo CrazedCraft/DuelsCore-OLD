@@ -18,39 +18,28 @@
 
 namespace duels\ui\elements\request;
 
-use core\CorePlayer;
-use duels\Main;
-use duels\session\PlayerSession;
+use duels\DuelsPlayer;
 use duels\ui\elements\generic\KitSelectionButton;
 use pocketmine\utils\TextFormat as TF;
 
 class DuelRequestKitSelectionButton extends KitSelectionButton {
 
 	/**
-	 * Add player to
-	 *
 	 * @param bool $value
-	 * @param CorePlayer $player
+	 * @param DuelsPlayer $player
 	 */
 	public function handle($value, $player) {
-		$plugin = Main::getInstance();
-		$pSession = $sSession = $plugin->sessionManager->get($player->getName());
-		if($pSession instanceof PlayerSession) {
-			$entity = $pSession->lastTapped;
-			if($entity instanceof CorePlayer and $entity->isOnline()) {
-				$eSession = $rSession = $plugin->sessionManager->get($entity->getName());
-				if($eSession instanceof PlayerSession) {
-					if(!$pSession->inParty()) {
-						$pSession->lastSelectedKit = $this->getKit();
-						$rSession->addRequest($player, $entity, $this->getKit()->getDisplayName() . " Kit");
-						$player->sendMessage(TF::AQUA . "Sent a duel request to " . TF::BOLD . TF::GREEN . $entity->getName() . TF::RESET . TF::AQUA . "!");
-					} else {
-						$player->sendMessage(TF::RED . "You can't send a duel request whilst in a party!");
-					}
-				}
+		$entity = $player->getLastTappedPlayer();
+		if($entity instanceof DuelsPlayer) {
+			if(!$player->hasParty()) {
+				$player->setLastSelectedKit($this->getKit());
+				$entity->addRequest($player, $entity, $this->getKit()->getDisplayName() . " Kit");
+				$player->sendMessage(TF::AQUA . "Sent a duel request to " . TF::BOLD . TF::GREEN . $entity->getName() . TF::RESET . TF::AQUA . "!");
 			} else {
-				$player->sendMessage(TF::RED . "Could not send duel request due to player being offline!");
+				$player->sendMessage(TF::RED . "You can't send a duel request whilst in a party!");
 			}
+		} else {
+			$player->sendMessage(TF::RED . "Could not send duel request due to player being offline!");
 		}
 	}
 

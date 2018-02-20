@@ -20,7 +20,7 @@ namespace duels\party;
 
 use core\CorePlayer;
 use core\Utils;
-use duels\session\PlayerSession;
+use duels\DuelsPlayer;
 use pocketmine\Player;
 
 class Party {
@@ -80,18 +80,16 @@ class Party {
 	}
 
 	/**
-	 * @param CorePlayer $player
+	 * @param DuelsPlayer $player
 	 * @param bool $broadcast
 	 */
-	public function addPlayer(CorePlayer $player, bool $broadcast = true) {
-		/** @var $session PlayerSession */
-		if(($session = $this->getManager()->getPlugin()->sessionManager->get($player->getName())) instanceof PlayerSession) {
-			$session->setParty($this);
-			if($broadcast)
-				$this->broadcastMessage(Utils::translateColors("&6- &a{$player->getName()} has joined the party!"));
-			$this->players[$player->getName()] = $player->getUniqueId()->toString();
-			if($broadcast)
-				$player->sendMessage(Utils::translateColors("&6- &aYou have joined {$this->owner}('s) party!"));
+	public function addPlayer(DuelsPlayer $player, bool $broadcast = true) {
+		$player->setParty($this);
+		$this->players[$player->getName()] = $player->getUniqueId()->toString();
+
+		if($broadcast) {
+			$this->broadcastMessage(Utils::translateColors("&6- &a{$player->getName()} has joined the party!"));
+			$player->sendMessage(Utils::translateColors("&6- &aYou have joined {$this->owner}('s) party!"));
 		}
 	}
 
@@ -133,11 +131,13 @@ class Party {
 	public function removePlayer(string $name, bool $broadcast = true) {
 		if(isset($this->players[$name])) {
 			unset($this->players[$name]);
-			if($broadcast)
+			if($broadcast) {
 				$this->broadcastMessage(Utils::translateColors("&c- &6{$name} has left the party!"));
-			/** @var $session PlayerSession */
-			if(($session = $this->getManager()->getPlugin()->getSessionManager()->get($name)) instanceof PlayerSession) {
-				$session->removeParty();
+			}
+
+			$player = Utils::getPlayerByUUID($this->players[$name]);
+			if($player instanceof DuelsPlayer) {
+				$player->removeParty();
 			}
 			$this->checkPlayers();
 		}
@@ -162,11 +162,14 @@ class Party {
 				}
 				if(!$found) return;
 			}
-			if($broadcast)
+
+			if($broadcast) {
 				$this->broadcastMessage(Utils::translateColors("&c- &6{$name} was removed from the party!"));
-			/** @var $session PlayerSession */
-			if(($session = $this->getManager()->getPlugin()->sessionManager->get($name)) instanceof PlayerSession) {
-				$session->removeParty();
+			}
+
+			$player = Utils::getPlayerByUUID($this->players[$name]);
+			if($player instanceof DuelsPlayer) {
+				$player->removeParty();
 			}
 			$this->checkPlayers();
 		}
@@ -191,11 +194,11 @@ class Party {
 	}
 
 	/**
-	 * @param CorePlayer $player
+	 * @param DuelsPlayer $player
 	 *
 	 * @return bool
 	 */
-	public function acceptInvitation(CorePlayer $player) {
+	public function acceptInvitation(DuelsPlayer $player) {
 		if($this->hasInvitation($player->getName())) {
 			$invitation = $this->invitations[$player->getName()];
 			$this->addPlayer($player);

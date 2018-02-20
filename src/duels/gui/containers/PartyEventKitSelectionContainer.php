@@ -27,7 +27,6 @@ use duels\duel\Duel;
 use duels\gui\item\kit\KitGUIItem;
 use duels\kit\Kit;
 use duels\Main;
-use duels\session\PlayerSession;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat as TF;
 

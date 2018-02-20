@@ -4,6 +4,7 @@ namespace duels\duel;
 
 use core\language\LanguageUtils;
 use duels\arena\Arena;
+use duels\DuelsPlayer;
 use duels\kit\Kit;
 use duels\Main;
 use pocketmine\item\Item;
@@ -91,7 +92,7 @@ class DuelManager {
 		return null;
 	}
 
-	public function findDuel(Player $player, int $type, Kit $kit = null, $checkOs = false) {
+	public function findDuel(DuelsPlayer $player, int $type, Kit $kit = null, $checkOs = false) {
 		$type = $this->getDuelType($type);
 
 		if($type === null) {
@@ -105,12 +106,10 @@ class DuelManager {
 					if($checkOs and !$duel->matchesOs($player->getDeviceOS())) continue;
 					if($kit instanceof Kit and $kit->getName() != $duel->getKit()->getName()) continue;
 					$duel->addPlayer($player);
-					return $this->plugin->sessionManager->get($player->getName())->setDuel($duel);
+					return;
 				} else {
 					continue;
 				}
-			} else {
-
 			}
 		}
 		if(count($this->duels) <= 30) {
@@ -121,12 +120,8 @@ class DuelManager {
 						if($checkOs and !$duel->matchesOs($player->getDeviceOS())) continue;
 						if($kit instanceof Kit and $kit->getName() != $duel->getKit()->getName()) continue;
 						$duel->addPlayer($player);
-						return $this->plugin->sessionManager->get($player->getName())->setDuel($duel);
-					} else {
-						continue;
+						return;
 					}
-				} else {
-
 				}
 			}
 		}
