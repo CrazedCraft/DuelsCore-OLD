@@ -5,11 +5,12 @@ namespace duels\tasks;
 use core\language\LanguageUtils;
 use duels\Main;
 use pocketmine\scheduler\PluginTask;
+use pocketmine\scheduler\Task;
 
 /**
  * Task that updates the info text in the lobby every 30 seconds
  */
-class UpdateInfoTextTask extends PluginTask  {
+class UpdateInfoTextTask extends Task {
 
 	/** @var Main */
 	private $plugin;
@@ -18,9 +19,8 @@ class UpdateInfoTextTask extends PluginTask  {
 	private $text = [];
 
 	public function __construct(Main $plugin) {
-		parent::__construct($plugin);
 		$this->plugin = $plugin;
-		$this->setHandler($plugin->getServer()->getScheduler()->scheduleRepeatingTask($this, 20 * 30));
+		$plugin->getScheduler()->scheduleRepeatingTask($this, 20 * 30);
 		//$this->text = [
 		//	LanguageUtils::translateColors("&eMake sure to follow us on twitter! &l&9@&bCrazedCraft&r&e!&r"),
 		//	LanguageUtils::translateColors("&6Make sure to follow us on twitter! &l&9@&bConflictPE&r&6!&r"),

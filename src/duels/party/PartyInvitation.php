@@ -23,9 +23,9 @@ use core\language\LanguageUtils;
 use core\Utils;
 use duels\DuelsPlayer;
 use pocketmine\Player;
-use pocketmine\scheduler\PluginTask;
+use pocketmine\scheduler\Task;
 
-class PartyInvitation extends PluginTask {
+class PartyInvitation extends Task {
 
 	/** @var Party */
 	private $party = null;
@@ -37,10 +37,9 @@ class PartyInvitation extends PluginTask {
 	private $accepted = false;
 
 	public function __construct(Party $party, CorePlayer $player) {
-		parent::__construct($party->getManager()->getPlugin());
 		$this->party = $party;
 		$this->invitee = $player->getName();
-		$this->setHandler($party->getManager()->getPlugin()->getServer()->getScheduler()->scheduleDelayedTask($this, 20 * 60));
+		$party->getManager()->getPlugin()->getScheduler()->scheduleDelayedTask($this, 20 * 60);
 	}
 
 	/**

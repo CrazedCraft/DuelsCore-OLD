@@ -1,7 +1,24 @@
 <?php
 
+/**
+ * SelectionNPC.php – DuelsCore
+ *
+ * Copyright (C) 2018 Jack Noordhuis
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * @author Jack
+ *
+ */
+
+declare(strict_types=1);
+
 namespace duels\entity;
 
+use core\entity\npc\HumanNPC;
 use core\language\LanguageUtils;
 use core\Utils;
 use duels\arena\Arena;
@@ -9,25 +26,23 @@ use duels\duel\Duel;
 use duels\duel\DuelType;
 use duels\DuelsPlayer;
 use duels\Main;
-use pocketmine\entity\Human;
 use pocketmine\event\entity\EntityDamageByEntityEvent;
 use pocketmine\event\entity\EntityDamageEvent;
+use pocketmine\level\ChunkLoader;
+use pocketmine\level\format\Chunk;
+use pocketmine\math\Vector3;
 use pocketmine\nbt\tag\StringTag;
-use pocketmine\network\protocol\AddPlayerPacket;
-use pocketmine\network\protocol\MovePlayerPacket;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat as TF;
 
-class HumanNPC extends Human {
-
-	public $defaultYaw = 180;
-	public $defaultPitch = 0;
+class SelectionNPC extends HumanNPC implements ChunkLoader {
 
 	/** @var DuelType */
 	private $type = "";
 
 	private $customName = "Duels";
-	protected $hasReset = [];
+
+	public $active = true;
 
 	/**
 	 * @param DuelType $type
@@ -43,103 +58,18 @@ class HumanNPC extends Human {
 		return $this->type;
 	}
 
-	public function setCustomName($name) {
-		$this->customName = $name;
-	}
-
-	public function spawnTo(Player $player) {
-		if($player !== $this and !isset($this->hasSpawned[$player->getId()])) {
-			$this->hasSpawned[$player->getId()] = $player;
-
-			$this->server->updatePlayerListData($this->getUniqueId(), $this->getId(), "", $player->getSkinName(), $player->getSkinData(), "", "", "", "", [$player]);
-
-			$pk = new AddPlayerPacket();
-			$pk->uuid = $this->getUniqueId();
-			$pk->username = $this->getNameTag();
-			$pk->eid = $this->getId();
-			$pk->x = $this->x;
-			$pk->y = $this->y;
-			$pk->z = $this->z;
-			$pk->speedX = 0;
-			$pk->speedY = 0;
-			$pk->speedZ = 0;
-			$pk->yaw = $this->yaw;
-			$pk->pitch = $this->pitch;
-			//$pk->item = $this->getInventory()->getItemInHand();
-			$pk->metadata = $this->dataProperties;
-			$player->dataPacket($pk);
-
-			$this->inventory->sendArmorContents($player);
-			$this->level->addPlayerHandItem($this, $player);
-		}
-	}
-
 	public function showPlaying($count) {
 		$this->setNameTag(TF::YELLOW . LanguageUtils::centerPrecise($this->customName . "\n\n\n\n\n\n\n\n\n\n\n\n" . TF::BOLD . TF::YELLOW . $count . " playing" . TF::RESET, null));
 	}
 
-	public function center($toCentre, $checkAgainst) {
-		if(strlen($toCentre) >= strlen($checkAgainst)) {
-			return $toCentre;
-		}
-
-		$times = floor((strlen($checkAgainst) - strlen($toCentre)) / 2);
-		return str_repeat(" ", ($times > 0 ? $times : 0)) . $toCentre;
-	}
-
-	public function saveNBT() {
-		return false;
-	}
-
-	public function look(Player $player) {
-		$x = $this->x - $player->x;
-		$y = $this->y - $player->y;
-		$z = $this->z - $player->z;
-		$yaw = asin($x / sqrt($x * $x + $z * $z)) / 3.14 * 180;
-		$pitch = round(asin($y / sqrt($x * $x + $z * $z + $y * $y)) / 3.14 * 180);
-		if($z > 0) $yaw = -$yaw + 180;
-
-		$pk = new MovePlayerPacket();
-		$pk->eid = $this->id;
-		$pk->x = $this->x;
-		$pk->y = $this->y + $this->getEyeHeight();
-		$pk->z = $this->z;
-		$pk->bodyYaw = $yaw;
-		$pk->pitch = $pitch;
-		$pk->yaw = $yaw;
-		$pk->mode = 0;
-		$player->dataPacket($pk);
-		if($this->isReset($player)) unset($this->hasReset[$player->getId()]);
-	}
-
-	public function resetLook(Player $player) {
-		if(!$this->isReset($player)) {
-			$pk = new MovePlayerPacket();
-			$pk->eid = $this->id;
-			$pk->x = $this->x;
-			$pk->y = $this->y + $this->getEyeHeight();
-			$pk->z = $this->z;
-			$pk->bodyYaw = $this->defaultYaw;
-			$pk->pitch = $this->defaultPitch;
-			$pk->yaw = $this->defaultYaw;
-			$pk->mode = 0;
-			$player->dataPacket($pk);
-			$this->hasReset[$player->getId()] = $player;
-		}
-	}
-
-	protected function initEntity() {
+	public function initEntity() : void {
 		parent::initEntity();
-		if(isset($this->namedtag->customName) and $this->namedtag->customName instanceof StringTag) {
-			$this->customName = $this->namedtag["customName"];
+		if($this->namedtag->hasTag("customName") and ($n = $this->namedtag->getString("CustomName")) instanceof StringTag) {
+			$this->customName = $n;
 		}
 	}
 
-	public function isReset(Player $player) {
-		return isset($this->hasReset[$player->getId()]);
-	}
-
-	public function attack($damage, EntityDamageEvent $source) {
+	public function attack(EntityDamageEvent $source): void {
 		if($source instanceof EntityDamageByEntityEvent) {
 			$attacker = $source->getDamager();
 			if($attacker instanceof DuelsPlayer) {
@@ -222,7 +152,36 @@ class HumanNPC extends Human {
 				}
 			}
 		}
-		parent::attack($damage, $source);
+
+		parent::attack($source);
+	}
+
+	public function getLoaderId(): int {
+		return $this->getId();
+	}
+
+	public function isLoaderActive(): bool {
+		return $this->active;
+	}
+
+	public function onChunkChanged(Chunk $chunk) {
+		// TODO: Implement onChunkChanged() method.
+	}
+
+	public function onChunkLoaded(Chunk $chunk) {
+		// TODO: Implement onChunkLoaded() method.
+	}
+
+	public function onBlockChanged(Vector3 $block) {
+		// TODO: Implement onBlockChanged() method.
+	}
+
+	public function onChunkPopulated(Chunk $chunk) {
+		// TODO: Implement onChunkPopulated() method.
+	}
+
+	public function onChunkUnloaded(Chunk $chunk) {
+		// TODO: Implement onChunkUnloaded() method.
 	}
 
 }

@@ -7,6 +7,8 @@ use core\entity\text\UpdatableFloatingText;
 use core\gui\item\defaults\serverselector\ServerSelector;
 use core\gui\item\defaults\SpawnWarpItem;
 use core\util\traits\CorePluginReference;
+use duels\duel\DuelType;
+use duels\entity\SelectionNPC;
 use duels\gui\containers\play\PlayDuelTypeSelectionContainer;
 use duels\gui\containers\play\PlayKitSelectionContainer;
 use duels\gui\containers\request\DuelRequestDuelTypeSelectionContainer;
@@ -29,13 +31,16 @@ use duels\ui\windows\play\PlayDuelTypeSelectionForm;
 use duels\ui\windows\play\PlayKitSelectionForm;
 use duels\ui\windows\request\DuelRequestDuelTypeSelectionForm;
 use duels\ui\windows\request\DuelRequestKitSelectionForm;
+use pocketmine\entity\Entity;
 use pocketmine\item\Item;
 use pocketmine\level\Position;
 use pocketmine\math\Vector3;
+use pocketmine\nbt\tag\StringTag;
 use pocketmine\Player;
 use pocketmine\plugin\PluginBase;
 use pocketmine\utils\Config;
-use pocketmine\utils\PluginException;
+use pocketmine\plugin\PluginException;
+use pocketmine\utils\TextFormat;
 
 class Main extends PluginBase {
 
@@ -75,6 +80,9 @@ class Main extends PluginBase {
 
 	/** @var BossBar */
 	public $lobbyBossBar = null;
+
+	/** @var SelectionNPC */
+	private $npcs = [];
 
 	/** @var array */
 	public static $languages = [
@@ -167,6 +175,10 @@ class Main extends PluginBase {
 	}
 
 	public function onDisable() {
+		foreach($this->npcs as $npc) {
+			$npc->active = false;
+		}
+
 		$this->duelManager->close();
 		$this->partyManager->close();
 		unset($this->sessionManager, $this->arenaManager, $this->npcManager, $this->duelManager);
@@ -310,6 +322,41 @@ class Main extends PluginBase {
 				$this->getLogger()->logException($e);
 			}
 		}
+	}
+
+	protected function spawnNPCs() : void {
+		$data = $this->npcData();
+		foreach($data as $npc) {
+			$nbt = Entity::createBaseNBT($npc["pos"], null, $npc["rotation"]["yaw"], $npc["rotation"]["pitch"]);
+			$nbt->setString("customName", new StringTag("customName", $npc["name"]));
+
+			/** @var SelectionNPC $entity */
+			$entity = Entity::createEntity("SelectionNPC", $level = $this->getServer()->getDefaultLevel(), $nbt);
+			$entity->setType($npc["type"]);
+			$entity->showPlaying(0);
+			$chunk = $level->getChunk($entity->getX(), $entity->getZ());
+			$level->registerChunkLoader($entity, $chunk->getX(), $chunk->getZ());
+			$entity->spawnToAll();
+		}
+	}
+
+	private function npcData() : array {
+		return [
+			[
+				"name" => TextFormat::YELLOW . "» Play - 1v1 «",
+				"pos" => new Vector3(0.5, 96, 69.5),
+				"rotation" => ["yaw" => 180, "pitch" => 0,],
+				"skin" => "default",
+				"type" => DuelType::DUEL_TYPE_1V1
+			],
+			[
+				"name" => TextFormat::YELLOW . "» Play - 2v2 «",
+				"pos" => new Vector3(69.5, 96, 0.5),
+				"rotation" => ["yaw" => 90, "pitch" => 0,],
+				"skin" => "default",
+				"type" => DuelType::DUEL_TYPE_2v2
+			]
+		];
 	}
 
 }

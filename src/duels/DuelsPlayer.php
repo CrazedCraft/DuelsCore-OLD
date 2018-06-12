@@ -329,13 +329,12 @@ class DuelsPlayer extends CorePlayer {
 		$this->partyId = null;
 	}
 
-	public function attack($damage, EntityDamageEvent $source) {
-		$v = parent::attack($damage, $source);
+	public function attack(EntityDamageEvent $source) : void {
+		parent::attack($source);
 
 		if($source->isCancelled()) {
 			Main::getInstance()->listener->onDamage($source);
 		}
-		return $v;
 	}
 
 	public function kill($forReal = false) {

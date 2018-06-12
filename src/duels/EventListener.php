@@ -267,7 +267,7 @@ class EventListener implements Listener {
 			$event->setCancelled();
 			return;
 		} elseif($slot instanceof KitSelector) {
-			if($player->isAuthenticated()) {
+			if($player->isAuthenticatedInternally()) {
 				$event->setCancelled(false);
 			} else {
 				$player->sendTip(TF::RED . "Please authenticate first!");

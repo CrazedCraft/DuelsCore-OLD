@@ -4,18 +4,17 @@ namespace duels\tasks;
 
 use duels\Main;
 use pocketmine\Player;
-use pocketmine\scheduler\PluginTask;
+use pocketmine\scheduler\Task;
 use pocketmine\utils\TextFormat as TF;
 
-class RequestTask extends PluginTask {
+class RequestTask extends Task {
 
 	public $target;
 	public $from;
 	private $plugin;
 
 	public function __construct(Main $plugin, Player $target, Player $from) {
-		parent::__construct($plugin);
-		$this->setHandler($plugin->getServer()->getScheduler()->scheduleDelayedTask($this, 20 * 60 * 2));
+		$plugin->getScheduler()->scheduleDelayedTask($this, 20 * 60 * 2));
 		$this->plugin = $plugin;
 		$this->target = $target;
 		$this->from = $from;
