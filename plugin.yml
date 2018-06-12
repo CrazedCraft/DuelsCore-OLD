@@ -1,12 +1,11 @@
 name: Duels
 authors: ["Jack Noordhuis"]
-version: 0.0.2_ALPHA
+version: 0.0.3_ALPHA
 description: Conflict's duels plugin
 main: duels\Main
 load: POSTWORLD
-depend:
-  - Components
-api: ["2.0.0"]
+depend: [Components]
+api: [3.0.0-ALPHA12]
 
 commands:
   duel:

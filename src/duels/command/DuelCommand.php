@@ -21,7 +21,7 @@ class DuelCommand implements CommandExecutor {
 		$this->plugin = $plugin;
 	}
 
-	public function onCommand(CommandSender $sender, Command $cmd, $label, array $args) {
+	public function onCommand(CommandSender $sender, Command $cmd, string $label, array $args) : bool {
 		if($sender instanceof DuelsPlayer) {
 			if(isset($args[0])) {
 				$requester = $this->plugin->getServer()->getPlayer($args[0]);

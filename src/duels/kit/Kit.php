@@ -133,7 +133,7 @@ class Kit {
 			foreach($this->items as $i => $item) {
 				$inv->setItem($i, $item);
 			}
-			$inv->setArmorContents($this->armor);
+			$player->getArmorInventory()->setContents($this->armor);
 		}
 	}
 

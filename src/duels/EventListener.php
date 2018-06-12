@@ -157,6 +157,8 @@ class EventListener implements Listener {
 				if($attacker instanceof DuelsPlayer and $attacker->getState() === CorePlayer::STATE_LOBBY and $target instanceof DuelsPlayer and $target->getState() === CorePlayer::STATE_LOBBY) {
 					$item = $attacker->getInventory()->getItemInHand();
 					if($item->getId() === Item::STICK and $item instanceof GUIItem) {
+						$attacker->sendMessage(TF::RED . "Duel requests are temporarily disabled! They'll be back soon!");
+						return;
 						if(!$attacker->hasParty()) {
 							if($attacker->hasDuelRequest($target->getName())) {
 								$attacker->removeRequest($target->getName());

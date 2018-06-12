@@ -5,9 +5,10 @@ namespace duels\duel;
 use duels\DuelsPlayer;
 use duels\Main;
 use pocketmine\scheduler\PluginTask;
+use pocketmine\scheduler\Task;
 use pocketmine\utils\TextFormat as TF;
 
-class DuelCountdown extends PluginTask {
+class DuelCountdown extends Task {
 
 	/** @var Main */
 	private $plugin;
@@ -31,8 +32,7 @@ class DuelCountdown extends PluginTask {
 	private $isActive = true;
 
 	public function __construct(Main $plugin, Duel $duel) {
-		parent::__construct($plugin);
-		$this->setHandler($plugin->getServer()->getScheduler()->scheduleRepeatingTask($this, 20));
+		$plugin->getScheduler()->scheduleRepeatingTask($this, 20);
 		$this->plugin = $plugin;
 		$this->duel = $duel;
 	}

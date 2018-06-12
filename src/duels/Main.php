@@ -24,7 +24,6 @@ use duels\duel\Duel;
 use duels\duel\DuelManager;
 use duels\gui\item\kit\KitSelector;
 use duels\kit\KitManager;
-use duels\npc\NPCManager;
 use duels\party\PartyManager;
 use duels\tasks\UpdateInfoTextTask;
 use duels\ui\windows\play\PlayDuelTypeSelectionForm;
@@ -58,9 +57,6 @@ class Main extends PluginBase {
 	/** @var ArenaManager */
 	public $arenaManager;
 
-	/** @var NPCManager */
-	public $npcManager;
-
 	/** @var DuelManager */
 	public $duelManager;
 
@@ -81,8 +77,8 @@ class Main extends PluginBase {
 	/** @var BossBar */
 	public $lobbyBossBar = null;
 
-	/** @var SelectionNPC */
-	private $npcs = [];
+	/** @var SelectionNPC[] */
+	public $npcs = [];
 
 	/** @var array */
 	public static $languages = [
@@ -120,7 +116,6 @@ class Main extends PluginBase {
 		$this->loadConfigs();
 		$this->setArenaManager();
 		$this->setDuelManager();
-		$this->setNPCManager();
 		$this->setKitManager();
 		$this->setPartyManager();
 		$this->registerGuiContainers();
@@ -165,11 +160,6 @@ class Main extends PluginBase {
 		$this->infoText[] = new UpdatableFloatingText(new Position($pos->x, $pos->y, $pos->z, $level), self::translateColors($text[array_rand($text)]));
 	}
 
-	public function setNPCManager() {
-		if(isset($this->npcManager) and $this->npcManager instanceof NPCManager) return;
-		$this->npcManager = new NPCManager($this);
-	}
-
 	public static function translateColors($string, $symbol = "&") {
 		return LanguageUtils::translateColors($string, $symbol);
 	}
@@ -191,10 +181,6 @@ class Main extends PluginBase {
 	public function setArenaManager() {
 		if(isset($this->arenaManager) and $this->arenaManager instanceof ArenaManager) return;
 		$this->arenaManager = new ArenaManager($this);
-	}
-
-	public function getNPCMananger() {
-		return $this->npcManager;
 	}
 
 	public function getDuelManager() {

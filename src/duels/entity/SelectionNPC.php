@@ -28,21 +28,16 @@ use duels\DuelsPlayer;
 use duels\Main;
 use pocketmine\event\entity\EntityDamageByEntityEvent;
 use pocketmine\event\entity\EntityDamageEvent;
-use pocketmine\level\ChunkLoader;
-use pocketmine\level\format\Chunk;
-use pocketmine\math\Vector3;
 use pocketmine\nbt\tag\StringTag;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat as TF;
 
-class SelectionNPC extends HumanNPC implements ChunkLoader {
+class SelectionNPC extends HumanNPC {
 
 	/** @var DuelType */
 	private $type = "";
 
 	private $customName = "Duels";
-
-	public $active = true;
 
 	/**
 	 * @param DuelType $type
@@ -154,34 +149,6 @@ class SelectionNPC extends HumanNPC implements ChunkLoader {
 		}
 
 		parent::attack($source);
-	}
-
-	public function getLoaderId(): int {
-		return $this->getId();
-	}
-
-	public function isLoaderActive(): bool {
-		return $this->active;
-	}
-
-	public function onChunkChanged(Chunk $chunk) {
-		// TODO: Implement onChunkChanged() method.
-	}
-
-	public function onChunkLoaded(Chunk $chunk) {
-		// TODO: Implement onChunkLoaded() method.
-	}
-
-	public function onBlockChanged(Vector3 $block) {
-		// TODO: Implement onBlockChanged() method.
-	}
-
-	public function onChunkPopulated(Chunk $chunk) {
-		// TODO: Implement onChunkPopulated() method.
-	}
-
-	public function onChunkUnloaded(Chunk $chunk) {
-		// TODO: Implement onChunkUnloaded() method.
 	}
 
 }

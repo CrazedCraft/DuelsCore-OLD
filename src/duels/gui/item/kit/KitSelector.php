@@ -36,11 +36,11 @@ class KitSelector extends GUIItem {
 	 */
 	public function onClick(CorePlayer $player) {
 		if(!$player->hasParty()) {
-			if($player->getPlayerProtocol() >= Info::PROTOCOL_120) {
+			//if($player->getPlayerProtocol() >= Info::PROTOCOL_120) {
 				$player->showModal($player->getCore()->getUIManager()->getForm(PlayDuelTypeSelectionForm::FORM_UI_ID));
-			} else {
-				$player->openGuiContainer($player->getCore()->getGuiManager()->getContainer(PlayDuelTypeSelectionContainer::CONTAINER_ID));
-			}
+			//} else {
+			//	$player->openGuiContainer($player->getCore()->getGuiManager()->getContainer(PlayDuelTypeSelectionContainer::CONTAINER_ID));
+			//}
 		} else {
 			$player->sendMessage(TF::RED . "You must use the party event item or the NPC's to play duels while in a party!");
 		}

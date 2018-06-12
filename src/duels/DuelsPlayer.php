@@ -337,7 +337,7 @@ class DuelsPlayer extends CorePlayer {
 		}
 	}
 
-	public function kill($forReal = false) {
+	public function kill($forReal = false) : void {
 		if($this->hasDuel() and $this->getState() === CorePlayer::STATE_PLAYING) {
 			$duel = $this->getDuel();
 			$duel->broadcast(TF::BOLD . TF::AQUA . $this->getName() . TF::RESET . TF::YELLOW . " was killed!");

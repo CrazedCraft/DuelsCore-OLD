@@ -33,7 +33,7 @@ class UpdateInfoTextTask extends Task {
 
 	public function onRun($currentTick) {
 		$this->plugin->infoText["playing"]->update(Main::translateColors("&aThere are " . count($this->plugin->getServer()->getOnlinePlayers()) . " players online"));
-		foreach($this->plugin->getNPCMananger()->NPCs as $npc) {
+		foreach($this->plugin->npcs as $npc) {
 			$npc->showPlaying($this->plugin->getPlayingCount($npc->getType()));
 		}
 		//$this->plugin->lobbyBossBar->setText(LanguageUtils::translateColors($this->text[array_rand($this->text)]));

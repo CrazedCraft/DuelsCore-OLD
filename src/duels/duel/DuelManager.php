@@ -8,8 +8,8 @@ use duels\DuelsPlayer;
 use duels\kit\Kit;
 use duels\Main;
 use pocketmine\item\Item;
-use pocketmine\item\Skull;
 use pocketmine\Player;
+use pocketmine\tile\Skull;
 use pocketmine\utils\TextFormat as TF;
 
 class DuelManager {

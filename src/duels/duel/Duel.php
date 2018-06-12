@@ -84,7 +84,7 @@ class Duel {
 		if(!$this->ended) {
 			$this->ended = true;
 			if(isset($this->plugin)) {
-				$this->plugin->getServer()->getScheduler()->cancelTask($this->countdown->getTaskId());
+				$this->plugin->getScheduler()->cancelTask($this->countdown->getTaskId());
 				$this->plugin->arenaManager->addBack($this->arena);
 				$this->plugin->duelManager->removeDuel($this->arena->getId());
 			}
@@ -135,12 +135,12 @@ class Duel {
 				$p->setHealth(20);
 				$p->setFood(20);
 				$p->teleport(Main::$spawnCoords);
-				$p->getInventory()->sendContents($p);
-				$p->getInventory()->sendArmorContents($p);
 				//$this->plugin->lobbyBossBar->spawnTo($p);
 				if($p->getInventory() instanceof PlayerInventory) {
 					$p->getInventory()->clearAll();
-					$p->getInventory()->sendArmorContents($p);
+					$p->getArmorInventory()->clearAll();
+					$p->getInventory()->sendContents($p);
+					$p->getArmorInventory()->sendContents($p);
 				}
 				$p->setNameTag(TF::YELLOW . TF::clean($p->getName()));
 				$p->removeDuel();
@@ -396,7 +396,7 @@ class Duel {
 		$victim->teleport(Main::$spawnCoords);
 		if($victim->getInventory() instanceof PlayerInventory) $victim->getInventory()->clearAll();
 		$victim->getInventory()->sendContents($victim);
-		$victim->getInventory()->sendArmorContents($victim);
+		$victim->getArmorInventory()->sendContents($victim);
 		$victim->removeDuel();
 		$victim->setNameTag(TF::YELLOW . TF::clean($victim->getName()));
 		if($victim->isOnline()) $this->plugin->giveLobbyItems($victim);;
@@ -438,7 +438,7 @@ class Duel {
 	}
 
 	public function matchesOS(int $os) {
-		$isWindows = in_array($os, [Player::OS_WIN10, Player::OS_WIN32]);
+		$isWindows = in_array($os, [CorePlayer::OS_WIN10, CorePlayer::OS_WIN32]);
 		if($this->os === self::OS_MOBILE) {
 			return !$isWindows;
 		} else {

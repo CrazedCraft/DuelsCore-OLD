@@ -29,11 +29,11 @@ class DuelKitRequestSelector extends GUIItem {
 	}
 
 	public function onClick(CorePlayer $player) {
-		if($player->getPlayerProtocol() >= Info::PROTOCOL_120) {
+		//if($player->getPlayerProtocol() >= Info::PROTOCOL_120) {
 			$player->showModal($player->getCore()->getUIManager()->getForm(DuelRequestDuelTypeSelectionForm::FORM_UI_ID));
-		} else {
-			$player->openGuiContainer($player->getCore()->getGuiManager()->getContainer(DuelRequestDuelTypeSelectionContainer::CONTAINER_ID));
-		}
+		//} else {
+		//	$player->openGuiContainer($player->getCore()->getGuiManager()->getContainer(DuelRequestDuelTypeSelectionContainer::CONTAINER_ID));
+		//}
 	}
 
 	public function getCooldown() : int {
